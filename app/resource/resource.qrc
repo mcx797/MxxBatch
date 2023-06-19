@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/LeadingBatch">
+        <file>logo.png</file>
+        <file>i18n/gallery.zh_CN.qm</file>
+        <file>i18n/gallery.zh_HK.qm</file>
+    </qresource>
+</RCC>

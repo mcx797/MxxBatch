@@ -1,0 +1,81 @@
+[
+	{
+		"target":"储层参数评价_储层参数评价图头信息",
+		"suffix":[".txt"],
+		"rules": [
+			{
+				"type":"in",
+				"content": ["图头"],
+				"start":"0",
+				"end":"0",
+				"vars":"图头"
+			}
+		]
+	},
+	{
+		"target":"储层参数评价_储层分类",
+		"suffix":[".xls", "xlsx"],
+		"rules": [
+			{
+					"type":"in",
+					"content":["储层分类", "储层综合分类"],
+					"start":"0",
+					"end":"0"
+				}
+			]
+		},
+		{
+			"target":"储层参数评价_目的层测井分层",
+			"suffix":[".xls", ".xlsx"],
+			"rules": [
+				{
+					"type":"in",
+					"content":["目的层"],
+					"start":"0",
+					"end":"0"
+				}
+			]
+		},
+		{
+			"target":"储层参数评价_全井段测井分层",
+			"suffix":[".xls", ".xlsx"],
+			"rules": [
+				{
+					"type":"in",
+					"content":["全井段"],
+					"start":"0",
+					"end":"0"
+				}
+			]
+		},
+		{
+			"target":"储层参数评价_全井段测井分层",
+			"suffix":[".xls", ".xlsx"],
+			"rules": [
+				{
+					"type":"in",
+					"content":["全井"],
+					"start":"0",
+					"end":"0"
+				},
+				{
+					"type":"in",
+					"content":["分层"],
+					"start":"0",
+					"end":"0"
+				}
+			]
+		},
+		{
+			"target":"储层参数评价_可压性综合解释结论",
+			"suffix":[".xls", ".xlsx"],
+			"rules": [
+				{
+					"type":"in",
+					"content":["可压性"],
+					"start":"0",
+					"end":"0"
+				}
+			]
+		}
+	]
