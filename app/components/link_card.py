@@ -5,6 +5,7 @@ from qfluentwidgets import IconWidget, TextWrap, SingleDirectionScrollArea
 
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
+from mxx.mxxfile.Path import Path as MxxPath
 
 
 class LinkCard(QFrame):
@@ -14,7 +15,8 @@ class LinkCard(QFrame):
         self._iconWidget = IconWidget(icon, self)
         self._titleLabel = QLabel(title, self)
         self._url = url
-        self._contentLabel = QLabel(TextWrap.wrap(cfg.get(self._url), 28, False)[0], self)
+        self._path = MxxPath(cfg.get(self._url))
+        self._contentLabel = QLabel(self._path.linkCardPath(28), self)
         self._signal = signal
         self._signal.connect(self.__refreshContent)
         self.__initWidget()
@@ -41,14 +43,14 @@ class LinkCard(QFrame):
         url = ''
         if os.path.isfile(cfg.get(self._url)):
             fileLink = QFileDialog.getOpenFileName(
-                self, self.tr('Choose folder'), cfg.get(self._url)
+                self, self.tr('Choose folder'), self._path.path()
             )
             print(fileLink[0])
             url = fileLink[0]
         else:
             print('-------------------')
             fileLink = QFileDialog.getExistingDirectory(
-                self, self.tr('Choose folder'), cfg.get(self._url)
+                self, self.tr('Choose folder'), self._path.path()
             )
             print(fileLink)
             url = fileLink
@@ -61,8 +63,8 @@ class LinkCard(QFrame):
         self._signal.emit()
 
     def __refreshContent(self):
-        print('refresh content table')
-        self._contentLabel.setText(TextWrap.wrap(cfg.get(self._url), 28, False)[0])
+        self._path = MxxPath(cfg.get(self._url))
+        self._contentLabel.setText(self._path.linkCardPath(28))
         self.repaint()
 
 

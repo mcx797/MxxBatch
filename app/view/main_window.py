@@ -14,7 +14,12 @@ from app.view.setting_interface import SettingInterface
 from app.view.mxx_interface import MxxInterface
 from app.common.style_sheet import StyleSheet
 from app.view.unlabeled_interface import UnlabeledInterface
+from app.view.labeled_interface import LabeledInterface
 
+from app.common.config import cfg
+from mxx.mxxfile.Path import Path as MxxPath
+from mxx.mxxintermediate.IntermediateConfig import Config as INTConfig
+from mxx.mxxfile.JsonFile import JsonFile as MxxJsonFile
 
 class StackedWidget(QFrame):
     """ Stacked widget """
@@ -57,9 +62,22 @@ class MainWindow(FramelessWindow):
         self.stackWidget = StackedWidget(self)
         self.navigationInterface = NavigationInterface(self, True, True)
 
-        self.homeInterface = HomeInterface(self)
-        self.settingInterface = SettingInterface(self)
-        self.unlabeledInterface = UnlabeledInterface(self)
+        path = MxxPath(cfg.get(cfg.INTFile))
+        print(path.filePath())
+        self._INTConfig = INTConfig(MxxJsonFile(path.filePath()))
+        if self._INTConfig != None and self._INTConfig.isConfig():
+            print('INT load ok!')
+            #self._ruleConfig = RuleConfig()
+            #self._ruleConfig = RuleConfig()
+        #print(self._INTConfig)
+        path = MxxPath(cfg.get(cfg.sourceFolder))
+        print(path.path())
+
+
+        self._homeInterface = HomeInterface(self)
+        self._settingInterface = SettingInterface(self)
+        self._unlabeledInterface = UnlabeledInterface(self)
+        self._labeledInterface = LabeledInterface(self)
 
         ''' Initialization '''
         self.initLayout()
@@ -86,20 +104,23 @@ class MainWindow(FramelessWindow):
 
     def initNavigation(self):
         self.addSubInterface(
-            self.homeInterface, 'homeInterface', FIF.HOME, self.tr('Home'), NavigationItemPosition.TOP)
+            self._homeInterface, 'homeInterface', FIF.HOME, self.tr('Home'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self.unlabeledInterface, 'unlabeledInterface', FIF.FOLDER, self.tr('Unlabeled'), NavigationItemPosition.TOP)
+            self._labeledInterface, 'labeledInterface', FIF.FOLDER, self.tr('labeled'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self.settingInterface, 'settingInterface', FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
+            self._unlabeledInterface, 'unlabeledInterface', FIF.FOLDER, self.tr('Unlabeled'), NavigationItemPosition.TOP)
+
+        self.addSubInterface(
+            self._settingInterface, 'settingInterface', FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
 
         # !IMPORTANT: don't forget to set the default route key if you enable the return button
-        qrouter.setDefaultRouteKey(self.stackWidget, self.homeInterface.objectName())
+        qrouter.setDefaultRouteKey(self.stackWidget, self._homeInterface.objectName())
 
         self.stackWidget.currentWidgetChanged.connect(self.onCurrentWidgetChanged)
         self.navigationInterface.setCurrentItem(
-            self.homeInterface.objectName())
+            self._homeInterface.objectName())
         self.stackWidget.setCurrentIndex(0)
 
     def initWindow(self):

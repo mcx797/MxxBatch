@@ -16,7 +16,7 @@ class JsonFile(File):
         except:
             print('mxxfile/JsonFile.py no such file in {}'.format(self.filePath()))
             return None
-        ans = ''
+        ans = {}
         try:
             ans = json.load(file)
         except:
@@ -24,8 +24,6 @@ class JsonFile(File):
             ans = None
         file.close()
         return ans
-
-
 
 if __name__ == '__main__':
     file_path = 'C:\\Users\\77902\\Desktop\\LeadingBatch\\config\\leading_rule.json'

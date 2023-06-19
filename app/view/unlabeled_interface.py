@@ -73,8 +73,6 @@ class CardView(QWidget):
         self.scrollWidget = QWidget(self.scrollArea)
 
 
-
-
 class UnlabeledInterface(MxxInterface):
     def __init__(self, parent=None):
         super().__init__(
@@ -83,5 +81,5 @@ class UnlabeledInterface(MxxInterface):
             parent = parent
         )
 
-        self.cardView = CardView(self)
-        self.vBoxLayout.addWidget(self.cardView)
+        self._cardView = CardView(self)
+        self.vBoxLayout.addWidget(self._cardView)
