@@ -16,6 +16,7 @@ class StyleSheet(StyleSheetBase, Enum):
     SETTING_INTERFACE = "setting_interface"
     MXX_INTERFACE = "mxx_interface"
     NAVIGATION_VIEW_INTERFACE = "navigation_view_interface"
+    UNLABELED_INTERFACE = 'unlabeled_interface'
 
     def path(self, theme=Theme.AUTO):
         theme = qconfig.theme if theme == Theme.AUTO else theme

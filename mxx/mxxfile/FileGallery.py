@@ -10,6 +10,8 @@ class FileGallery(Gallery):
         super().__init__()
         self._path = root_path
         self._rule_gallery = rule_gallery
+        if self._rule_gallery == None:
+            return
         self.__loadFiles(self._path)
 
     def __str__(self):
@@ -29,3 +31,17 @@ class FileGallery(Gallery):
                 if path_temp.fileName()[0:2] == '~$':
                     continue
                 self.addItem(LabeledFile(path_temp, self._rule_gallery))
+
+    def unlabeledFiles(self):
+        ans = []
+        for item in self._gallery:
+            if item.isLabeled() == False:
+                ans.append(item)
+        return ans
+
+    def labeledFiles(self):
+        ans = []
+        for item in self._gallery:
+            if item.isLabeled == True:
+                ans.append(item)
+        return ans

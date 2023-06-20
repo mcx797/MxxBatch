@@ -26,3 +26,9 @@ class LabeledFile(File):
 
     def label(self):
         return self._label
+
+    def path(self):
+        return self._path
+
+    def __str__(self):
+        return str(self._path.path())

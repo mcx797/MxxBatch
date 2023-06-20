@@ -76,15 +76,13 @@ class MainWindow(FramelessWindow):
         else:
             self._ruleGallery = None
 
-        if self._ruleGallery != None:
-            source_path = MxxPath(cfg.get(cfg.sourceFolder))
-            self._file_gallery = FileGallery(source_path, self._ruleGallery)
-
+        source_path = MxxPath(cfg.get(cfg.sourceFolder))
+        self._file_gallery = FileGallery(source_path, self._ruleGallery)
 
 
         self._homeInterface = HomeInterface(self)
         self._settingInterface = SettingInterface(self)
-        self._unlabeledInterface = UnlabeledInterface(self)
+        self._unlabeledInterface = UnlabeledInterface(self, self._file_gallery)
         self._labeledInterface = LabeledInterface(self)
 
         ''' Initialization '''
