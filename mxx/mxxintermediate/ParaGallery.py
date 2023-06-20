@@ -31,10 +31,11 @@ class ParaGallery(Gallery):
             return None
 
     def __str__(self):
-        ans = ''
+        ans = '['
         for key in self._gallery:
-            ans = ans + '{{key: {0}, value:{1}}}'\
-                .format(str(key), str(self.item(key).value()))
+            ans = ans + '{{ key={} '.format(key) + str(self._gallery[key]) + '}}, '
+        ans = ans[:-2]
+        ans = ans + ']'
         return ans
 
 
@@ -48,6 +49,9 @@ class ParaItem():
 
     def value(self):
         return self._value
+
+    def __str__(self):
+        return 'value={} '.format(self._value)
 
 
 class OptionItem(ParaItem):
@@ -63,6 +67,10 @@ class OptionItem(ParaItem):
     def options(self):
         return self._options
 
+    def __str__(self):
+        ans = super().__str__()
+        ans = ans + 'options={} '.format(self._options)
+        return ans
 
 class ComboItem(ParaItem):
     def __init__(self, parent, para:dict):
@@ -80,4 +88,7 @@ class ComboItem(ParaItem):
         for item in self._paras:
             para_list.append(item.value())
         return super().value().format(para_list)
+
+    def __str__(self):
+        return 'value={} '.format(self.value())
 

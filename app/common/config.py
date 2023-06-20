@@ -30,13 +30,15 @@ class Config(QConfig):
 
     # folders
     INTFile = ConfigItem(
-        "Files", "INT", "config/leading_INT.json")
+        "Files", "INT", "config\\leading_INT.json")
     ruleFile = ConfigItem(
-        "Files", "Rule", "config/leading_rule.json")
+        "Files", "Rule", "config\\leading_rule.json")
     sourceFolder = ConfigItem(
         "Folders", "Source", "sourceFolder")
     targetFolder = ConfigItem(
         "Folders", "Target", "targetFolder")
+    logFolder = ConfigItem(
+        "Folders", "Log", "config\\log")
 
     # main window
     dpiScale = OptionsConfigItem(

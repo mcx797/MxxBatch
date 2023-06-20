@@ -14,7 +14,7 @@ class File:
     def fileSuffix(self):
         if self._path == None:
             return None
-        return self.fileName().split('.')[-1]
+        return self._path.fileSuffix()
 
     def fileContent(self):
         if self._path == None:

@@ -10,15 +10,11 @@ class Path:
             return path_str.split('/')
 
     def path(self):
+        if len(self._path) == 0:
+            return ''
         ans = self._path[0]
-        if len(self._path) == 1:
-            return ans
-        if ans[-1] == ':' and len(ans) == 2:
-            ans = ans + '\\' + self._path[1]
-        else:
-            os.path.join(ans, self._path[1])
-        for i in range(2, len(self._path)):
-            ans = os.path.join(ans, self._path[i])
+        for i in range(1, len(self._path)):
+            ans = ans + '\\' + self._path[i]
         return ans
 
     def linkCardPath(self, max_len):
@@ -48,27 +44,28 @@ class Path:
         return ans
 
     def filePath(self):
-        if (self._path == None):
-            return None
-        ans = self._path[0]
-        if len(self._path) == 1:
-            return 'not a file'
-        if ans[-1] == ':' and len(ans) == 2:
-            ans = ans + '\\' + self._path[1]
-        else:
-            os.path.join(ans, self._path[1])
-        for i in range(2, len(self._path)):
-            ans = os.path.join(ans, self._path[i])
+        ans = self.path()
         if not os.path.isfile(ans):
             ans = 'not a file'
         return ans
 
     def fileName(self):
         if not os.path.isfile(self.filePath()):
-            print('mxx.mxxfile.Path: not a file path')
-            return 'notFile.notFile'
+            print('mxx.mxxfile.Path: not a file path {}'.format(self.path()))
+            return ''
         return self._path[-1]
 
+    def root(self, idx):
+        return self._path[idx]
+
+    def __getitem__(self, item:int):
+        return self._path[item]
+
+    def __len__(self):
+        return len(self._path)
+
+    def fileSuffix(self):
+        return self.fileName().split('.')[-1]
 
 if __name__ == '__main__':
     path = Path('D:\\2023\\Leading\\FileArr\\INT\\Leading_INT.json')

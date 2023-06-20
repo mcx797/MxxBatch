@@ -1,7 +1,7 @@
 [
 	{
 		"target":"储层参数评价_储层参数评价图头信息",
-		"suffix":[".txt"],
+		"suffix":["txt"],
 		"rules": [
 			{
 				"type":"in",
@@ -14,7 +14,7 @@
 	},
 	{
 		"target":"储层参数评价_储层分类",
-		"suffix":[".xls", "xlsx"],
+		"suffix":["xls", "xlsx"],
 		"rules": [
 			{
 					"type":"in",
@@ -26,7 +26,7 @@
 		},
 		{
 			"target":"储层参数评价_目的层测井分层",
-			"suffix":[".xls", ".xlsx"],
+			"suffix":["xls", "xlsx"],
 			"rules": [
 				{
 					"type":"in",
@@ -38,7 +38,7 @@
 		},
 		{
 			"target":"储层参数评价_全井段测井分层",
-			"suffix":[".xls", ".xlsx"],
+			"suffix":["xls", "xlsx"],
 			"rules": [
 				{
 					"type":"in",
@@ -50,7 +50,7 @@
 		},
 		{
 			"target":"储层参数评价_全井段测井分层",
-			"suffix":[".xls", ".xlsx"],
+			"suffix":["xls", "xlsx"],
 			"rules": [
 				{
 					"type":"in",
@@ -68,7 +68,7 @@
 		},
 		{
 			"target":"储层参数评价_可压性综合解释结论",
-			"suffix":[".xls", ".xlsx"],
+			"suffix":["xls", "xlsx"],
 			"rules": [
 				{
 					"type":"in",

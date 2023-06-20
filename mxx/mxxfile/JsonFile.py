@@ -2,7 +2,6 @@ import json
 
 from mxx.mxxfile.File import File as File
 
-
 class JsonFile(File):
     def __init__(self, file_path):
         super().__init__(file_path)

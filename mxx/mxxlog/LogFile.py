@@ -1,4 +1,5 @@
 from mxx.mxxfile.File import File
+from app.common.config import cfg
 import datetime
 
 class LogFile(File):
@@ -11,8 +12,14 @@ class LogFile(File):
             f.write(str(datetime.datetime.now()) + '\n')
             f.write(logContent + '\n\n')
 
-wrong_log = LogFile('C:\\Users\\77902\\Desktop\\LeadingBatch\\log\\wrong.log')
+url = cfg.get(cfg.logFolder)
+wrong_url = url + '\\wrong.log'
+wrong_log = LogFile(wrong_url)
+auto_url = url + '\\auto.log'
+auto_log = LogFile(auto_url)
 
 if __name__ == '__main__':
-    file = LogFile('C:\\Users\\77902\\Desktop\\LeadingBatch\\log\\wrong.log')
+    url = cfg.get(cfg.logFolder)
+    print(url)
+    file = LogFile('C:\\Users\\77902\\Desktop\\LeadingBatch\\config\\log\\wrong.log')
     file.addLog('test test')

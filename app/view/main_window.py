@@ -20,6 +20,9 @@ from app.common.config import cfg
 from mxx.mxxfile.Path import Path as MxxPath
 from mxx.mxxintermediate.IntermediateConfig import Config as INTConfig
 from mxx.mxxfile.JsonFile import JsonFile as MxxJsonFile
+from mxx.mxxrule.RuleGallery import RuleGallery
+from mxx.mxxfile.FileGallery import FileGallery
+from mxx.mxxlog.LogFile import wrong_log
 
 class StackedWidget(QFrame):
     """ Stacked widget """
@@ -62,16 +65,21 @@ class MainWindow(FramelessWindow):
         self.stackWidget = StackedWidget(self)
         self.navigationInterface = NavigationInterface(self, True, True)
 
-        path = MxxPath(cfg.get(cfg.INTFile))
-        print(path.filePath())
-        self._INTConfig = INTConfig(MxxJsonFile(path.filePath()))
-        if self._INTConfig != None and self._INTConfig.isConfig():
-            print('INT load ok!')
-            #self._ruleConfig = RuleConfig()
-            #self._ruleConfig = RuleConfig()
-        #print(self._INTConfig)
-        path = MxxPath(cfg.get(cfg.sourceFolder))
-        print(path.path())
+        INT_path = MxxPath(cfg.get(cfg.INTFile))
+        self._INTConfig = INTConfig(MxxJsonFile(INT_path.filePath()))
+        if self._INTConfig != None and not self._INTConfig.isConfig():
+            self._INTConfig = None
+
+        if self._INTConfig != None:
+            rule_path = MxxPath(cfg.get(cfg.ruleFile))
+            self._ruleGallery = RuleGallery(MxxJsonFile(rule_path.filePath()), self._INTConfig.INTGallery())
+        else:
+            self._ruleGallery = None
+
+        if self._ruleGallery != None:
+            source_path = MxxPath(cfg.get(cfg.sourceFolder))
+            self._file_gallery = FileGallery(source_path, self._ruleGallery)
+
 
 
         self._homeInterface = HomeInterface(self)

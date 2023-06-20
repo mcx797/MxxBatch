@@ -24,9 +24,12 @@ class Config:
         else:
             self._para_gallery = None
         if 'INT' in dic:
-            self.INT_gallery = IntermediateGallery(self, dic['INT'])
+            self._INT_gallery = IntermediateGallery(self, dic['INT'])
         else:
-            self.INT_gallery = None
+            self._INT_gallery = None
+
+    def INTGallery(self):
+        return self._INT_gallery
 
     def isConfig(self):
         if self._file == None:
@@ -35,9 +38,15 @@ class Config:
             return False
         if self._para_gallery == None:
             return False
-        if self.INT_gallery == None:
+        if self._INT_gallery == None:
             return False
         return True
+
+    def __str__(self):
+        ans = '{{description: {0}, para: {1}, INT: {2}}}'\
+            .format(self._description, str(self._para_gallery), str(self._INT_gallery))
+        return ans
+
 
 if __name__ == '__main__':
     file_path = 'C:\\Users\\77902\\Desktop\\LeadingBatch\\config\\leading_INT.json'
