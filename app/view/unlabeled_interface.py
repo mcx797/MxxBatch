@@ -11,21 +11,16 @@ from app.view.mxx_interface import MxxInterface
 
 from mxx.mxxfile.FileGallery import FileGallery
 from mxx.mxxfile.LabeledFile import LabeledFile
-from mxx.mxxfile.File import File
+
+from app.components.tree_frame import TreeFrame
+
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
 from mxx.mxxfile.Path import Path
 from app.common.open_file import open_file
 from app.view.relabel_dialog import RelabelDialog
-
-
-
-class LineEdit(SearchLineEdit):
-    def __init__(self, parent=None):
-        super().__init__(parent = parent)
-        self.setPlaceholderText(self.tr('Search files'))
-        self.setFixedWidth(304)
-        self.textChanged.connect(self.search)
+from app.components.line_edit import LineEdit
+from app.components.file_card import FileCard
 
 
 class MesPanel(QFrame):
@@ -70,105 +65,6 @@ class MesPanel(QFrame):
         self._file = file
         self.fileNameLabel.setText(file.fileName())
         self.frame.refresh(file)
-
-
-class Frame(QFrame):
-    def __init__(self, parent=None):
-        super().__init__(parent=parent)
-        self.hBoxLayout = QHBoxLayout(self)
-        self.hBoxLayout.setContentsMargins(0, 8, 0, 0)
-        self.setObjectName('frame')
-
-    def addWidget(self, widget):
-        self._widget = widget
-        self.hBoxLayout.addWidget(widget)
-
-    def clear(self):
-        self._widget.clear()
-        self.hBoxLayout.removeWidget(self._widget)
-
-
-class TreeFrame(Frame):
-    def __init__(self, parent = None, enableCheck=False):
-        super().__init__(parent)
-        self.tree = TreeWidget(self)
-        self.addWidget(self.tree)
-        item2 = QTreeWidgetItem([self.tr('1')])
-        item3 = QTreeWidgetItem([self.tr('2')])
-        item4 = QTreeWidgetItem([self.tr('3')])
-        item2.addChild(item3)
-        item3.addChild(item4)
-        self.tree.addTopLevelItem(item2)
-        self.tree.expandAll()
-        self.tree.setHeaderHidden(True)
-        self.setFixedSize(550, 400)
-
-        if enableCheck:
-            it = QTreeWidgetItemIterator(self.tree)
-            while(it.value()):
-                it.value().setCheckState(0, Qt.Unchecked)
-                it += 1
-
-    def refresh(self, file:LabeledFile):
-        self.tree.clear()
-        path_temp = Path(cfg.get(cfg.sourceFolder))
-        if len(file.path()) != 0:
-            itemTop = QTreeWidgetItem([self.tr(file.path()[len(path_temp) - 1])])
-            itemTemp = itemTop
-            for i in range(len(path_temp), len(file.path())):
-                item1 = QTreeWidgetItem([self.tr(file.path()[i])])
-                itemTemp.addChild(item1)
-                itemTemp = item1
-            self.tree.addTopLevelItem(itemTop)
-            self.tree.expandAll()
-
-
-class FileCard(QFrame):
-    clicked = pyqtSignal(LabeledFile)
-
-    def __init__(self, icon: FluentIcon, file:LabeledFile, parent=None):
-        super().__init__(parent=parent)
-        self._icon = icon
-        self._file = file
-        self._content = file.fileSuffix()
-        self.isSelected = False
-        self.iconWidget = IconWidget(icon, self)
-        self.nameLabel = QLabel(self)
-        self.vBoxLayout = QVBoxLayout(self)
-
-        self.setFixedSize(96, 96)
-        self.vBoxLayout.setSpacing(0)
-        self.vBoxLayout.setContentsMargins(8, 28, 8, 0)
-
-        self.vBoxLayout.setAlignment(Qt.AlignTop)
-        self.iconWidget.setFixedSize(28, 28)
-        self.vBoxLayout.addWidget(self.iconWidget, 0, Qt.AlignHCenter)
-        self.vBoxLayout.addSpacing(14)
-        self.vBoxLayout.addWidget(self.nameLabel, 0, Qt.AlignHCenter)
-
-        text = self.nameLabel.fontMetrics().elidedText(self._content, Qt.ElideRight, 78)
-        self.nameLabel.setText(text)
-
-    def mouseReleaseEvent(self, e):
-        if self.isSelected:
-            return
-
-        self.clicked.emit(self._file)
-
-    def setSelected(self, isSelected:bool, force=False):
-        if isSelected == self.isSelected and not force:
-            return
-
-        self.isSelected = isSelected
-
-        if not isSelected:
-            self.iconWidget.setIcon(self._icon)
-        else:
-            icon = self._icon.icon(Theme.LIGHT if isDarkTheme() else Theme.DARK)
-            self.iconWidget.setIcon(icon)
-
-        self.setProperty('isSelected', isSelected)
-        self.setStyle(QApplication.style())
 
 
 class CardView(QWidget):

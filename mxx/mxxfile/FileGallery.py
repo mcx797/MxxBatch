@@ -45,6 +45,6 @@ class FileGallery(Gallery):
     def labeledFiles(self):
         ans = []
         for item in self._gallery:
-            if item.isLabeled == True:
+            if item.isLabeled() == True:
                 ans.append(item)
         return ans

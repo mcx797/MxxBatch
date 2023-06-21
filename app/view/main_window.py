@@ -70,7 +70,7 @@ class MainWindow(FramelessWindow):
         self._homeInterface = HomeInterface(self)
         self._settingInterface = SettingInterface(self)
         self._unlabeledInterface = UnlabeledInterface(self, self._file_gallery)
-        self._labeledInterface = LabeledInterface(self)
+        self._labeledInterface = LabeledInterface(self, self._file_gallery)
 
         ''' Initialization '''
         self.initLayout()
