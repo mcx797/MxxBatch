@@ -188,7 +188,7 @@ class CardView(QWidget):
         self.flowLayout = FlowLayout(self.scrollWidget, isTight=False)
 
         self._cards = []
-        self._files = self._file_gallery.gallery()
+        self._files = self._file_gallery.unlabeledFiles()
         self._current_idx = -1
         self.__initWidget()
 
@@ -196,11 +196,8 @@ class CardView(QWidget):
         card = FileCard(icon, file, self)
         card.clicked.connect(self.__setSelectedFile)
         self._cards.append(card)
-        if not file.isLabeled():
-            card.setVisible(True)
-            self.flowLayout.addWidget(card)
-        else:
-            card.setVisible(False)
+        card.show()
+        self.flowLayout.addWidget(card)
 
     def __setSelectedFile(self, file:LabeledFile):
         index = self._files.index(file)
@@ -262,6 +259,10 @@ class CardView(QWidget):
                 card.show()
             else:
                 card.hide()
+        if len(indexes) > 0:
+            self.__setSelectedFile(self._files[indexes[0]])
+        self.repaint()
+
 
     def showAllFiles(self):
         indexes = []
@@ -271,11 +272,13 @@ class CardView(QWidget):
 
         for i, card in enumerate(self._cards):
             isVisible = i in indexes
-            card.setVisible(isVisible)
             if isVisible:
                 card.show()
             else:
                 card.hide()
+        if len(indexes) > 0:
+            self.__setSelectedFile(self._files[indexes[0]])
+
         self.repaint()
 
 
