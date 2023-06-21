@@ -9,6 +9,10 @@ from app.components.link_card import LinkCardView, LinkCard
 from app.common.config import cfg
 from app.common.signal_bus import signalBus
 
+from app.components.home_card import HomeCardView, HomeCard
+
+from qfluentwidgets import FluentIcon as FIF
+
 class BannerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -89,7 +93,7 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout = QVBoxLayout(self.view)
 
         self.__initWidget()
-        self.loadSamples()
+        self.loadHomeMes()
 
     def __initWidget(self):
         self.view.setObjectName('view')
@@ -104,5 +108,19 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout.addWidget(self.banner)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
 
-    def loadSamples(self):
-        print('hahaha')
+    def loadHomeMes(self):
+        self._file_label_view = HomeCardView(
+            self.tr("文件分类情况"), self.view)
+        self._file_label_view.addFileCard(
+            icon = FIF.CHECKBOX,
+            title="已分类文件",
+            content= self.tr("the number of labeled files is {}".format(10)),
+            route_key = 'labeledInterface'
+        )
+        self._file_label_view.addFileCard(
+            icon = FIF.DATE_TIME,
+            title="未分类文件",
+            content = self.tr("the number of unlabeled files is {}".format(20)),
+            route_key= 'unlabeledInterface'
+        )
+        self.vBoxLayout.addWidget(self._file_label_view)

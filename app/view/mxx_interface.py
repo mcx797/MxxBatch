@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QFrame
 from PyQt5.QtGui import QPainter, QPen, QColor
 from qfluentwidgets import (ScrollArea, FluentIcon, PushButton, ToolButton, isDarkTheme, IconWidget)
 from app.common.style_sheet import StyleSheet
+from app.common.signal_bus import signalBus
 
 class SeparatorWidget(QWidget):
     """ Seperator widget """
@@ -31,8 +32,8 @@ class ToolBar(QWidget):
         self.titleLabel = QLabel(title, self)
         self.subtitleLabel = QLabel(subtitle, self)
 
-        self.documentButton = PushButton(
-            self.tr('Documentation'), self, FluentIcon.DOCUMENT)
+        self.homeButton = PushButton(
+            self.tr('回到主页'), self, FluentIcon.HOME)
         self.sourceButton = PushButton(self.tr('文件重命名'), self, FluentIcon.GITHUB)
 
 
@@ -54,12 +55,16 @@ class ToolBar(QWidget):
 
         self.buttonLayout.setSpacing(4)
         self.buttonLayout.setContentsMargins(0, 0, 0, 0)
-        self.buttonLayout.addWidget(self.documentButton, 0, Qt.AlignLeft)
+        self.buttonLayout.addWidget(self.homeButton, 0, Qt.AlignLeft)
         self.buttonLayout.addWidget(self.sourceButton, 0, Qt.AlignLeft)
         self.buttonLayout.addStretch(1)
 
         self.titleLabel.setObjectName('titleLabel')
         self.subtitleLabel.setObjectName('subtitleLabel')
+
+        self.homeButton.clicked.connect(
+            lambda: signalBus.switchToSampleCard.emit('homeInterface')
+        )
 
 
 class ExampleCard(QWidget):

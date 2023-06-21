@@ -8,13 +8,13 @@ from app.components.frameless_window import FramelessWindow
 from app.components.title_bar import CustomTitleBar
 from app.common import resource
 
-
 from app.view.home_interface import HomeInterface
 from app.view.setting_interface import SettingInterface
 from app.view.mxx_interface import MxxInterface
 from app.common.style_sheet import StyleSheet
 from app.view.unlabeled_interface import UnlabeledInterface
 from app.view.labeled_interface import LabeledInterface
+from app.common.signal_bus import signalBus
 
 from app.common.config import cfg
 from mxx.mxxfile.Path import Path as MxxPath
@@ -104,7 +104,7 @@ class MainWindow(FramelessWindow):
         self.widgetLayout.addWidget(self.stackWidget)
         self.widgetLayout.setContentsMargins(0, 48, 0, 0)
 
-        #signalBus.switchToSampleCard.connect(self.switchToSample)
+        signalBus.switchToSampleCard.connect(self.switchToSample)
 
         self.navigationInterface.displayModeChanged.connect(
             self.titleBar.raise_)
@@ -169,10 +169,16 @@ class MainWindow(FramelessWindow):
     def switchTo(self, widget, triggerByUser=True):
         self.stackWidget.setCurrentWidget(widget, not triggerByUser)
 
-    def switchToSample(self, routeKey, index):
+    def switchToSample(self, routeKey):
         """ switch to sample """
+        if routeKey == 'homeInterface':
+            interfaces = self.findChildren(HomeInterface)
+            for w in interfaces:
+                if w.objectName() == routeKey:
+                    self.stackWidget.setCurrentWidget(w, False)
+            return
         interfaces = self.findChildren(MxxInterface)
         for w in interfaces:
             if w.objectName() == routeKey:
                 self.stackWidget.setCurrentWidget(w, False)
-                w.scrollToCard(index)
+
