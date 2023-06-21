@@ -34,6 +34,9 @@ class File:
     def filePath(self):
         return self._path.filePath()
 
+    def fileDir(self):
+        return self._path.fileDir()
+
     def fileName(self):
         return self._path.fileName()
 

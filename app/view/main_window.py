@@ -61,10 +61,25 @@ class MainWindow(FramelessWindow):
         ''' Initial Widgets '''
         self.hBoxLayout = QHBoxLayout(self)
         self.widgetLayout = QHBoxLayout()
-
         self.stackWidget = StackedWidget(self)
         self.navigationInterface = NavigationInterface(self, True, True)
 
+        ''' Initial Files '''
+        self.initFile()
+
+        self._homeInterface = HomeInterface(self)
+        self._settingInterface = SettingInterface(self)
+        self._unlabeledInterface = UnlabeledInterface(self, self._file_gallery)
+        self._labeledInterface = LabeledInterface(self)
+
+        ''' Initialization '''
+        self.initLayout()
+
+        self.initNavigation()
+
+        self.initWindow()
+
+    def initFile(self):
         INT_path = MxxPath(cfg.get(cfg.INTFile))
         self._INTConfig = INTConfig(MxxJsonFile(INT_path.filePath()))
         if self._INTConfig != None and not self._INTConfig.isConfig():
@@ -78,19 +93,6 @@ class MainWindow(FramelessWindow):
 
         source_path = MxxPath(cfg.get(cfg.sourceFolder))
         self._file_gallery = FileGallery(source_path, self._ruleGallery)
-
-
-        self._homeInterface = HomeInterface(self)
-        self._settingInterface = SettingInterface(self)
-        self._unlabeledInterface = UnlabeledInterface(self, self._file_gallery)
-        self._labeledInterface = LabeledInterface(self)
-
-        ''' Initialization '''
-        self.initLayout()
-
-        self.initNavigation()
-
-        self.initWindow()
 
     def initLayout(self):
         self.hBoxLayout.setSpacing(0)
@@ -113,10 +115,10 @@ class MainWindow(FramelessWindow):
             self._homeInterface, 'homeInterface', FIF.HOME, self.tr('Home'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self._labeledInterface, 'labeledInterface', FIF.FOLDER, self.tr('labeled'), NavigationItemPosition.TOP)
+            self._labeledInterface, 'labeledInterface', FIF.CHECKBOX, self.tr('labeled'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self._unlabeledInterface, 'unlabeledInterface', FIF.FOLDER, self.tr('Unlabeled'), NavigationItemPosition.TOP)
+            self._unlabeledInterface, 'unlabeledInterface', FIF.DATE_TIME, self.tr('Unlabeled'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
             self._settingInterface, 'settingInterface', FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)

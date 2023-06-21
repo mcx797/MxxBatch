@@ -30,5 +30,15 @@ class LabeledFile(File):
     def path(self):
         return self._path
 
+    def searchUnlabeled(self, keyWord: str):
+        if self.isLabeled():
+            return False
+        else:
+            for i in range(len(self.path())):
+                if keyWord in self.path()[i]:
+                    return True
+        return False
+
+
     def __str__(self):
         return str(self._path.path())

@@ -39,6 +39,9 @@ class FileGallery(Gallery):
                 ans.append(item)
         return ans
 
+    def gallery(self):
+        return self._gallery
+
     def labeledFiles(self):
         ans = []
         for item in self._gallery:

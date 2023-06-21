@@ -15,7 +15,7 @@ class BannerWidget(QWidget):
         self.setFixedHeight(336)
         self.vBoxLayout = QVBoxLayout(self)
         self.galleryLabel = QLabel('Config Gallery', self)
-        self.banner = QPixmap('app/resource/images/header1.png')
+        self.banner = QPixmap(':/LeadingBatch/images/header1.png')
         self.linkCardView = LinkCardView(self)
         self.galleryLabel.setObjectName('galleryLabel')
         self.vBoxLayout.setSpacing(0)
@@ -50,7 +50,6 @@ class BannerWidget(QWidget):
             cfg.targetFolder,
             signalBus.targetFolderChangedSignal
         )
-
 
 
     def paintEvent(self, e):
@@ -90,6 +89,7 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout = QVBoxLayout(self.view)
 
         self.__initWidget()
+        self.loadSamples()
 
     def __initWidget(self):
         self.view.setObjectName('view')
@@ -103,3 +103,6 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout.setSpacing(40)
         self.vBoxLayout.addWidget(self.banner)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
+
+    def loadSamples(self):
+        print('hahaha')

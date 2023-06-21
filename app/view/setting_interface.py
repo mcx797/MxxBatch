@@ -126,9 +126,7 @@ class SettingInterface(ScrollArea):
     def __onLogFolderCardClicked(self):
         folder =QFileDialog.getExistingDirectory(
             self,self.tr('Choose folder'), "./config/log")
-
-        if not folder or cfg.get(cfg.downloadFolder) == folder:
+        if not folder or cfg.get(cfg.logFolder) == folder:
             return
-
         cfg.set(cfg.logFolder, folder)
         self.logFolderCard.setContent(folder)

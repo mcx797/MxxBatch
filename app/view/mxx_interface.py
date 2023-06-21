@@ -33,7 +33,7 @@ class ToolBar(QWidget):
 
         self.documentButton = PushButton(
             self.tr('Documentation'), self, FluentIcon.DOCUMENT)
-        self.sourceButton = PushButton(self.tr('Source'), self, FluentIcon.GITHUB)
+        self.sourceButton = PushButton(self.tr('文件重命名'), self, FluentIcon.GITHUB)
 
 
         self.vBoxLayout = QVBoxLayout(self)

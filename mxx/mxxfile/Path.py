@@ -49,6 +49,15 @@ class Path:
             ans = 'not a file'
         return ans
 
+    def fileDir(self):
+        path = self._path
+        if len(path) < 1:
+            return ''
+        ans = path[0]
+        for i in range(1, len(path) - 1):
+            ans = ans + '\\' + path[i]
+        return ans
+
     def fileName(self):
         if not os.path.isfile(self.filePath()):
             print('mxx.mxxfile.Path: not a file path {}'.format(self.path()))

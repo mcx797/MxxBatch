@@ -15,6 +15,8 @@ from mxx.mxxfile.File import File
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
 from mxx.mxxfile.Path import Path
+from app.common.open_file import open_file
+from app.view.relabel_dialog import RelabelDialog
 
 
 
@@ -39,17 +41,30 @@ class MesPanel(QFrame):
         self.frame = TreeFrame(self, False)
         self.vBoxLayout.addWidget(self.frame)
 
-        self.button1 = PrimaryPushButton(self.tr('打开文件'))
-        self.button2 = PrimaryPushButton(self.tr('打开文件夹'))
-        self.button3 = PrimaryPushButton(self.tr('进行分类'))
+        self._button_open_file = PrimaryPushButton(self.tr('打开文件'))
+        self._button_open_dir = PrimaryPushButton(self.tr('打开文件夹'))
+        self._button_label = PrimaryPushButton(self.tr('进行分类'))
 
-        self.vBoxLayout.addWidget(self.button3)
-        self.vBoxLayout.addWidget(self.button1)
-        self.vBoxLayout.addWidget(self.button2)
 
-        #self.button1.clicked.connect(self.openFile)
-        #self.button2.clicked.connect(self.openDir)
-        #self.button3.clicked.connect(self.Classifier)
+        self.vBoxLayout.addWidget(self._button_open_dir)
+        self.vBoxLayout.addWidget(self._button_open_file)
+        self.vBoxLayout.addWidget(self._button_label)
+
+        self._button_open_file.clicked.connect(self.openFile)
+        self._button_open_dir.clicked.connect(self.openDir)
+        self._button_label.clicked.connect(self.reLabel)
+
+    def reLabel(self):
+        w = RelabelDialog()
+        w.show()
+        w.exec_()
+        print(w._type_items[w._type_idx])
+
+    def openDir(self):
+        open_file(self._file.fileDir())
+
+    def openFile(self):
+        open_file(self._file.filePath())
 
     def setMes(self, file:LabeledFile):
         self._file = file
@@ -78,11 +93,6 @@ class TreeFrame(Frame):
         super().__init__(parent)
         self.tree = TreeWidget(self)
         self.addWidget(self.tree)
-        item1 = QTreeWidgetItem([self.tr('井')])
-        item1.addChildren([
-            QTreeWidgetItem([self.tr('测井评价资料')])
-        ])
-        self.tree.addTopLevelItem(item1)
         item2 = QTreeWidgetItem([self.tr('1')])
         item3 = QTreeWidgetItem([self.tr('2')])
         item4 = QTreeWidgetItem([self.tr('3')])
@@ -120,6 +130,7 @@ class FileCard(QFrame):
         super().__init__(parent=parent)
         self._icon = icon
         self._file = file
+        self._content = file.fileSuffix()
         self.isSelected = False
         self.iconWidget = IconWidget(icon, self)
         self.nameLabel = QLabel(self)
@@ -135,7 +146,7 @@ class FileCard(QFrame):
         self.vBoxLayout.addSpacing(14)
         self.vBoxLayout.addWidget(self.nameLabel, 0, Qt.AlignHCenter)
 
-        text = self.nameLabel.fontMetrics().elidedText(file.fileSuffix(), Qt.ElideRight, 78)
+        text = self.nameLabel.fontMetrics().elidedText(self._content, Qt.ElideRight, 78)
         self.nameLabel.setText(text)
 
     def mouseReleaseEvent(self, e):
@@ -163,7 +174,7 @@ class FileCard(QFrame):
 class CardView(QWidget):
     def __init__(self, parent = None, file_gallery:FileGallery = None):
         super().__init__(parent=parent)
-        self.cardViewlabel = QLabel(self.tr('为自动分类文件'), self)
+        self.cardViewlabel = QLabel(self.tr('未自动分类文件'), self)
         self.searchLineEdit = LineEdit(self)
         self._file_gallery = file_gallery
 
@@ -177,22 +188,19 @@ class CardView(QWidget):
         self.flowLayout = FlowLayout(self.scrollWidget, isTight=False)
 
         self._cards = []
-        self._files = self._file_gallery.unlabeledFiles()
+        self._files = self._file_gallery.gallery()
         self._current_idx = -1
         self.__initWidget()
-
-        for file in self._files:
-            self.addCard(FIF.FOLDER, file)
-
-        if len(self._files) > 0:
-            self.__setSelectedFile(self._files[0])
-
 
     def addCard(self, icon:FluentIcon, file:LabeledFile):
         card = FileCard(icon, file, self)
         card.clicked.connect(self.__setSelectedFile)
         self._cards.append(card)
-        self.flowLayout.addWidget(card)
+        if not file.isLabeled():
+            card.setVisible(True)
+            self.flowLayout.addWidget(card)
+        else:
+            card.setVisible(False)
 
     def __setSelectedFile(self, file:LabeledFile):
         index = self._files.index(file)
@@ -225,17 +233,56 @@ class CardView(QWidget):
 
         self.__setQss()
 
+        self.searchLineEdit.clearSignal.connect(self.showAllFiles)
+        self.searchLineEdit.searchSignal.connect(self.search)
+
+        for file in self._files:
+            self.addCard(FIF.FOLDER, file)
+
+        for file in self._files:
+            if not file.isLabeled():
+                self.__setSelectedFile(file)
+                break
+
     def __setQss(self):
         self.view.setObjectName('cardView')
         self.scrollWidget.setObjectName('scrollWidget')
         self.cardViewlabel.setObjectName('cardViewLabel')
         StyleSheet.UNLABELED_INTERFACE.apply(self)
 
+    def search(self, keyWord: str):
+        indexes = []
+        for i, file in enumerate(self._files):
+            if file.searchUnlabeled(keyWord):
+                indexes.append(i)
+
+        for i, card in enumerate(self._cards):
+            isVisible = i in indexes
+            if isVisible:
+                card.show()
+            else:
+                card.hide()
+
+    def showAllFiles(self):
+        indexes = []
+        for i, file in enumerate(self._files):
+            if not file.isLabeled():
+                indexes.append(i)
+
+        for i, card in enumerate(self._cards):
+            isVisible = i in indexes
+            card.setVisible(isVisible)
+            if isVisible:
+                card.show()
+            else:
+                card.hide()
+        self.repaint()
+
 
 class UnlabeledInterface(MxxInterface):
     def __init__(self, parent=None, file_gallery:FileGallery = None):
         super().__init__(
-            title='未分类文件',
+            title='未自动分类文件',
             subtitle = 'unlabeled files',
             parent = parent
         )
