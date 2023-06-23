@@ -13,8 +13,8 @@ from app.components.file_card import FileCard
 
 from app.view.mxx_interface import MxxInterface
 
-from mxx.mxxfile.FileGallery import FileGallery
-from mxx.mxxfile.LabeledFile import LabeledFile
+from MXX.mxxfile.FileGallery import FileGallery
+from MXX.mxxfile.LabeledFile import LabeledFile
 
 
 
@@ -46,9 +46,7 @@ class MesPanel(QFrame):
         self._button_open_dir.clicked.connect(self.openDir)
 
     def openDir(self):
-        print(self._file.fileDir())
         open_file(self._file.fileDir())
-        print('start {} '.format(self._file.fileDir()))
 
     def openFile(self):
         open_file(self._file.filePath())

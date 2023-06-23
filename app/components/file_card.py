@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 
 from PyQt5.QtWidgets import QFrame, QLabel, QVBoxLayout, QApplication
 
-from mxx.mxxfile.LabeledFile import LabeledFile
+from MXX.mxxfile.LabeledFile import LabeledFile
 
 from qfluentwidgets import  FluentIcon, IconWidget, Theme, isDarkTheme
 

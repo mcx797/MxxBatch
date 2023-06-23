@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/LeadingBatch">
+    <qresource prefix="/Mxx">
         <file>logo.png</file>
         <file>qss/dark/home_interface.qss</file>
         <file>qss/dark/link_card.qss</file>

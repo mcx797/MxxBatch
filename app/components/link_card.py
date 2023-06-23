@@ -5,7 +5,7 @@ from qfluentwidgets import IconWidget, TextWrap, SingleDirectionScrollArea
 
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
-from mxx.mxxfile.Path import Path as MxxPath
+from MXX.mxxfile.Path import Path as MxxPath
 
 
 class LinkCard(QFrame):

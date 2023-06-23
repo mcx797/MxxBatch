@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QTreeWidgetItem, QTreeWidgetIte
 
 from qfluentwidgets import TreeWidget
 
-from mxx.mxxfile.LabeledFile import LabeledFile
+from MXX.mxxfile.LabeledFile import LabeledFile
 
 from PyQt5.QtCore import Qt
 
-from mxx.mxxfile.Path import Path
+from MXX.mxxfile.Path import Path
 
 from app.common.config import cfg
 

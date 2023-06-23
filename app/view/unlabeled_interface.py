@@ -9,14 +9,14 @@ from qfluentwidgets import FluentIcon as FIF
 
 from app.view.mxx_interface import MxxInterface
 
-from mxx.mxxfile.FileGallery import FileGallery
-from mxx.mxxfile.LabeledFile import LabeledFile
+from MXX.mxxfile.FileGallery import FileGallery
+from MXX.mxxfile.LabeledFile import LabeledFile
 
 from app.components.tree_frame import TreeFrame
 
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
-from mxx.mxxfile.Path import Path
+from MXX.mxxfile.Path import Path
 from app.common.open_file import open_file
 from app.view.relabel_dialog import RelabelDialog
 from app.components.line_edit import LineEdit

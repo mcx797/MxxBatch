@@ -13,6 +13,7 @@ from app.components.home_card import HomeCardView, HomeCard
 
 from qfluentwidgets import FluentIcon as FIF
 
+
 class BannerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)

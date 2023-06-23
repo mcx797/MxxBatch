@@ -14,15 +14,17 @@ from app.view.mxx_interface import MxxInterface
 from app.common.style_sheet import StyleSheet
 from app.view.unlabeled_interface import UnlabeledInterface
 from app.view.labeled_interface import LabeledInterface
+from app.view.all_type_labeled_interface import AllTypeLabeledInterface
+from app.view.type_labeled_interface import TypeLabeledInterface
 from app.common.signal_bus import signalBus
 
 from app.common.config import cfg
-from mxx.mxxfile.Path import Path as MxxPath
-from mxx.mxxintermediate.IntermediateConfig import Config as INTConfig
-from mxx.mxxfile.JsonFile import JsonFile as MxxJsonFile
-from mxx.mxxrule.RuleGallery import RuleGallery
-from mxx.mxxfile.FileGallery import FileGallery
-from mxx.mxxlog.LogFile import wrong_log
+from MXX.mxxfile.Path import Path as MxxPath
+from MXX.mxxintermediate.IntermediateConfig import Config as INTConfig
+from MXX.mxxfile.JsonFile import JsonFile as MxxJsonFile
+from MXX.mxxrule.RuleGallery import RuleGallery
+from MXX.mxxfile.FileGallery import FileGallery
+from MXX.mxxlog.LogFile import wrong_log
 
 class StackedWidget(QFrame):
     """ Stacked widget """
@@ -67,10 +69,21 @@ class MainWindow(FramelessWindow):
         ''' Initial Files '''
         self.initFile()
 
-        self._homeInterface = HomeInterface(self)
-        self._settingInterface = SettingInterface(self)
-        self._unlabeledInterface = UnlabeledInterface(self, self._file_gallery)
-        self._labeledInterface = LabeledInterface(self, self._file_gallery)
+
+
+        self._home_interface = HomeInterface(self)
+        self._setting_interface = SettingInterface(self)
+        self._unlabeled_interface = UnlabeledInterface(self, self._file_gallery)
+        self._labeled_interface = LabeledInterface(self, self._file_gallery)
+
+        self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._INT_type_dic)
+
+        self.labeled_file_interfaces_dic = {}
+
+        for item in self._INT_type_dic:
+            print(item)
+            print(self._INT_type_dic[item])
+            self.labeled_file_interfaces_dic[item] = TypeLabeledInterface(self, item, self._INT_type_dic[item])
 
         ''' Initialization '''
         self.initLayout()
@@ -94,6 +107,8 @@ class MainWindow(FramelessWindow):
         source_path = MxxPath(cfg.get(cfg.sourceFolder))
         self._file_gallery = FileGallery(source_path, self._ruleGallery)
 
+        self._INT_type_dic = self._INTConfig.INTTypeDic()
+
     def initLayout(self):
         self.hBoxLayout.setSpacing(0)
         self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
@@ -112,30 +127,45 @@ class MainWindow(FramelessWindow):
 
     def initNavigation(self):
         self.addSubInterface(
-            self._homeInterface, 'homeInterface', FIF.HOME, self.tr('Home'), NavigationItemPosition.TOP)
+            self._home_interface, 'homeInterface', FIF.HOME, self.tr('Home'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self._labeledInterface, 'labeledInterface', FIF.CHECKBOX, self.tr('labeled'), NavigationItemPosition.TOP)
+            self._labeled_interface, 'labeledInterface', FIF.CHECKBOX, self.tr('labeled'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self._unlabeledInterface, 'unlabeledInterface', FIF.DATE_TIME, self.tr('Unlabeled'), NavigationItemPosition.TOP)
+            self._unlabeled_interface, 'unlabeledInterface', FIF.DATE_TIME, self.tr('Unlabeled'), NavigationItemPosition.TOP)
 
         self.addSubInterface(
-            self._settingInterface, 'settingInterface', FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
+            self._all_type_labeled_interface, 'allTypeLabeledInterface', FIF.CALENDAR, self.tr('all type'), NavigationItemPosition.TOP)
+
+        self.navigationInterface.addSeparator()
+
+        for item in self._INT_type_dic:
+            self.addSubInterface(
+                self.labeled_file_interfaces_dic[item], '{}Interface'.format(item), FIF.DOCUMENT, self.tr(item))
+
+
+
+
+
+
+
+
+        self.addSubInterface(
+            self._setting_interface, 'settingInterface', FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
 
         # !IMPORTANT: don't forget to set the default route key if you enable the return button
-        qrouter.setDefaultRouteKey(self.stackWidget, self._homeInterface.objectName())
+        qrouter.setDefaultRouteKey(self.stackWidget, self._home_interface.objectName())
 
         self.stackWidget.currentWidgetChanged.connect(self.onCurrentWidgetChanged)
         self.navigationInterface.setCurrentItem(
-            self._homeInterface.objectName())
+            self._home_interface.objectName())
         self.stackWidget.setCurrentIndex(0)
 
     def initWindow(self):
-        self.resize(960, 680)
+        self.resize(960, 880)
         self.setMinimumWidth(960)
-        self.setMaximumWidth(1060)
-        self.setMinimumHeight(680)
+        self.setMinimumHeight(880)
         self.setWindowIcon(QIcon(':/LeadingBatch/logo.png'))
         self.setWindowTitle('  LeadingBatch')
         self.titleBar.setAttribute(Qt.WA_StyledBackground)

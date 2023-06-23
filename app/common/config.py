@@ -29,16 +29,18 @@ class Config(QConfig):
     """ Config of application """
 
     # folders
-    INTFile = ConfigItem(
-        "Files", "INT", "config\\leading_INT.json")
-    ruleFile = ConfigItem(
-        "Files", "Rule", "config\\leading_rule.json")
+    paraFolder = ConfigItem(
+        'Folders', 'para', 'config/para')
+    INTFolder = ConfigItem(
+        "Folders", "INT", "config/INT")
+    ruleFolder = ConfigItem(
+        "Folders", "Rule", "config/rule")
     sourceFolder = ConfigItem(
         "Folders", "Source", "sourceFolder")
     targetFolder = ConfigItem(
         "Folders", "Target", "targetFolder")
     logFolder = ConfigItem(
-        "Folders", "Log", "config\\log")
+        "Folders", "Log", "config/log")
 
     # main window
     dpiScale = OptionsConfigItem(
@@ -54,4 +56,5 @@ class Config(QConfig):
 
 
 cfg = Config()
-qconfig.load('config/config.json', cfg)
+qconfig.load('C:/Users/77902/Desktop/LeadingBatch/config/config.json', cfg)
+#qconfig.load('config/config.json', cfg)
