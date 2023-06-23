@@ -17,5 +17,6 @@ class MxINTItem(MxItem):
     def __init__(self, parent, path, name, dic):
         super().__init__(parent, path, name)
         if not isinstance(dic, dict):
+            print('hhh')
             
 
