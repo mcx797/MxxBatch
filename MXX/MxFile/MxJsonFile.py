@@ -3,7 +3,7 @@ from MXX.MxFile.MxFile import MxFile
 from MXX.MxLog.MxLog import MxLog
 
 class MxJsonFile(MxFile):
-    def __init__(self, path:str = ''):
+    def __init__(self, path):
         super().__init__(path)
         if not self.isFile:
             MxLog().wrongLog('MXX.MxJsonFile.MxJsonFile.py: no such file in {}'.format(path))

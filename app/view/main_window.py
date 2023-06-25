@@ -19,12 +19,10 @@ from app.view.type_labeled_interface import TypeLabeledInterface
 from app.common.signal_bus import signalBus
 
 from app.common.config import cfg
-from MXX.mxxfile.Path import Path as MxxPath
-from MXX.mxxintermediate.IntermediateConfig import Config as INTConfig
-from MXX.mxxfile.JsonFile import JsonFile as MxxJsonFile
-from MXX.mxxrule.RuleGallery import RuleGallery
-from MXX.mxxfile.FileGallery import FileGallery
-from MXX.mxxlog.LogFile import wrong_log
+from MXX.MxPath.MxPath import MxPath
+from MXX.MxConfig.MxConfig.MxConfig import MxConfig
+from MXX.MxFile.MxJsonFile import MxJsonFile
+from MXX.MxLog.MxLog import MxLog
 
 class StackedWidget(QFrame):
     """ Stacked widget """
@@ -71,19 +69,21 @@ class MainWindow(FramelessWindow):
 
 
 
-        self._home_interface = HomeInterface(self)
+        self._home_interface = HomeInterface(self, self._config)
         self._setting_interface = SettingInterface(self)
-        self._unlabeled_interface = UnlabeledInterface(self, self._file_gallery)
-        self._labeled_interface = LabeledInterface(self, self._file_gallery)
+        self._labeled_interface = LabeledInterface(self, self._config)
 
-        self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._INT_type_dic)
 
-        self.labeled_file_interfaces_dic = {}
+        #self._unlabeled_interface = UnlabeledInterface(self, self._file_gallery)
+        #self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._INT_type_dic)
 
+        #self.labeled_file_interfaces_dic = {}
+        '''
         for item in self._INT_type_dic:
             print(item)
             print(self._INT_type_dic[item])
             self.labeled_file_interfaces_dic[item] = TypeLabeledInterface(self, item, self._INT_type_dic[item])
+        '''
 
         ''' Initialization '''
         self.initLayout()
@@ -93,21 +93,11 @@ class MainWindow(FramelessWindow):
         self.initWindow()
 
     def initFile(self):
-        INT_path = MxxPath(cfg.get(cfg.INTFile))
-        self._INTConfig = INTConfig(MxxJsonFile(INT_path.filePath()))
-        if self._INTConfig != None and not self._INTConfig.isConfig():
-            self._INTConfig = None
+        self._config = MxConfig(cfg)
 
-        if self._INTConfig != None:
-            rule_path = MxxPath(cfg.get(cfg.ruleFile))
-            self._ruleGallery = RuleGallery(MxxJsonFile(rule_path.filePath()), self._INTConfig.INTGallery())
-        else:
-            self._ruleGallery = None
+        self._label_dic = self._config.labelDic
 
-        source_path = MxxPath(cfg.get(cfg.sourceFolder))
-        self._file_gallery = FileGallery(source_path, self._ruleGallery)
-
-        self._INT_type_dic = self._INTConfig.INTTypeDic()
+        print(self._label_dic)
 
     def initLayout(self):
         self.hBoxLayout.setSpacing(0)
@@ -132,6 +122,7 @@ class MainWindow(FramelessWindow):
         self.addSubInterface(
             self._labeled_interface, 'labeledInterface', FIF.CHECKBOX, self.tr('labeled'), NavigationItemPosition.TOP)
 
+        '''
         self.addSubInterface(
             self._unlabeled_interface, 'unlabeledInterface', FIF.DATE_TIME, self.tr('Unlabeled'), NavigationItemPosition.TOP)
 
@@ -143,12 +134,7 @@ class MainWindow(FramelessWindow):
         for item in self._INT_type_dic:
             self.addSubInterface(
                 self.labeled_file_interfaces_dic[item], '{}Interface'.format(item), FIF.DOCUMENT, self.tr(item))
-
-
-
-
-
-
+        '''
 
 
         self.addSubInterface(

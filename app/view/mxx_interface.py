@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPainter, QPen, QColor
 from qfluentwidgets import (ScrollArea, FluentIcon, PushButton, ToolButton, isDarkTheme, IconWidget)
 from app.common.style_sheet import StyleSheet
 from app.common.signal_bus import signalBus
+from MXX.MxConfig.MxConfig.MxConfig import MxConfig
 
 class SeparatorWidget(QWidget):
     """ Seperator widget """
@@ -135,8 +136,9 @@ class ExampleCard(QWidget):
 
 
 class MxxInterface(ScrollArea):
-    def __init__(self, title:str, subtitle:str, parent=None):
+    def __init__(self, parent, title:str, subtitle:str, mx_cfg:MxConfig):
         super().__init__(parent=parent)
+        self._mx_cfg = mx_cfg
         self.view = QWidget(self)
         self.toolBar = ToolBar(title, subtitle, self)
         self.vBoxLayout = QVBoxLayout(self.view)

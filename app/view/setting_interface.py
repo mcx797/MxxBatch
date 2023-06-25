@@ -7,6 +7,7 @@ from qfluentwidgets import (ScrollArea, ExpandLayout, SettingCardGroup,
 from qfluentwidgets import FluentIcon as FIF
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
+from app.common.signal_bus import signalBus
 
 
 class SettingInterface(ScrollArea):
@@ -21,13 +22,53 @@ class SettingInterface(ScrollArea):
         # folder group
 
         self.folderGroup = SettingCardGroup(
-            self.tr("Folders Url"), self.scrollWidget)
+            self.tr("配置文件夹"), self.scrollWidget)
 
-        self.logFolderCard =PushSettingCard(
+        self.paraFolderCard = PushSettingCard(
             self.tr('Choose folder'),
-            FIF.DOWNLOAD,
+            FIF.FOLDER,
+            self.tr('para directory'),
+            cfg.get(cfg.paraFolder),
+            self.folderGroup
+        )
+
+        self.INTFolderCard = PushSettingCard(
+            self.tr('Choose folder'),
+            FIF.FOLDER,
+            self.tr('INT directory'),
+            cfg.get(cfg.INTFolder),
+            self.folderGroup
+        )
+
+        self.ruleFolderCard = PushSettingCard(
+            self.tr('Choose folder'),
+            FIF.FOLDER,
+            self.tr('rule directory'),
+            cfg.get(cfg.ruleFolder),
+            self.folderGroup
+        )
+
+        self.logFolderCard = PushSettingCard(
+            self.tr('Choose folder'),
+            FIF.FOLDER,
             self.tr("log directory"),
             cfg.get(cfg.logFolder),
+            self.folderGroup
+        )
+
+        self.sourceFolderCard = PushSettingCard(
+            self.tr('Choose folder'),
+            FIF.FOLDER,
+            self.tr('source directory'),
+            cfg.get(cfg.sourceFolder),
+            self.folderGroup
+        )
+
+        self.targetFolderCard = PushSettingCard(
+            self.tr('Choose folder'),
+            FIF.FOLDER,
+            self.tr('target directory'),
+            cfg.get(cfg.targetFolder),
             self.folderGroup
         )
 
@@ -104,7 +145,12 @@ class SettingInterface(ScrollArea):
     def __initLayout(self):
         self.settingLabel.move(36, 30)
 
+        self.folderGroup.addSettingCard(self.paraFolderCard)
+        self.folderGroup.addSettingCard(self.INTFolderCard)
+        self.folderGroup.addSettingCard(self.ruleFolderCard)
         self.folderGroup.addSettingCard(self.logFolderCard)
+        self.folderGroup.addSettingCard(self.sourceFolderCard)
+        self.folderGroup.addSettingCard(self.targetFolderCard)
 
         self.personalGroup.addSettingCard(self.themeCard)
         self.personalGroup.addSettingCard(self.themeColorCard)
@@ -120,13 +166,45 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.materialGroup)
 
     def __connectSignalToSlot(self):
-        self.logFolderCard.clicked.connect(
-            self.__onLogFolderCardClicked)
+        self.paraFolderCard.clicked.connect(
+            lambda : self.__onFolderCardClicked('para', cfg.paraFolder, signalBus.paraFolderChangedSignal))
 
-    def __onLogFolderCardClicked(self):
-        folder =QFileDialog.getExistingDirectory(
-            self,self.tr('Choose folder'), "./config/log")
-        if not folder or cfg.get(cfg.logFolder) == folder:
+        self.INTFolderCard.clicked.connect(
+            lambda : self.__onFolderCardClicked('INT', cfg.INTFolder, signalBus.INTFolderChangedSignal))
+
+        self.ruleFolderCard.clicked.connect(
+            lambda : self.__onFolderCardClicked('rule', cfg.ruleFolder, signalBus.ruleFolderChangedSignal))
+
+        self.logFolderCard.clicked.connect(
+            lambda : self.__onFolderCardClicked('log', cfg.logFolder, signalBus.logFolderChangedSignal))
+
+        self.sourceFolderCard.clicked.connect(
+            lambda : self.__onFolderCardClicked('source', cfg.sourceFolder, signalBus.sourceFolderChangedSignal))
+
+        self.targetFolderCard.clicked.connect(
+            lambda : self.__onFolderCardClicked('target', cfg.targetFolder, signalBus.targetFolderChangedSignal))
+
+        signalBus.INTFolderChangedSignal.connect(self.__refreshContent)
+        signalBus.ruleFolderChangedSignal.connect(self.__refreshContent)
+        signalBus.logFolderChangedSignal.connect(self.__refreshContent)
+        signalBus.paraFolderChangedSignal.connect(self.__refreshContent)
+        signalBus.sourceFolderChangedSignal.connect(self.__refreshContent)
+        signalBus.targetFolderChangedSignal.connect(self.__refreshContent)
+
+
+    def __refreshContent(self):
+        self.paraFolderCard.setContent(cfg.get(cfg.paraFolder))
+        self.INTFolderCard.setContent(cfg.get(cfg.INTFolder))
+        self.ruleFolderCard.setContent(cfg.get(cfg.ruleFolder))
+        self.logFolderCard.setContent(cfg.get(cfg.logFolder))
+        self.sourceFolderCard.setContent(cfg.get(cfg.sourceFolder))
+        self.targetFolderCard.setContent(cfg.get(cfg.targetFolder))
+
+    def __onFolderCardClicked(self, name, cfg_item, signal):
+        folder = QFileDialog.getExistingDirectory(
+            self, self.tr('Choose folder', './config/{}'.format(name)))
+        if not folder or cfg.get(cfg_item) == folder:
             return
-        cfg.set(cfg.logFolder, folder)
-        self.logFolderCard.setContent(folder)
+        cfg.set(cfg_item, folder)
+        signal.emit()
+

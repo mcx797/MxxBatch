@@ -9,14 +9,13 @@ from qfluentwidgets import FluentIcon as FIF
 
 from app.view.mxx_interface import MxxInterface
 
-from MXX.mxxfile.FileGallery import FileGallery
-from MXX.mxxfile.LabeledFile import LabeledFile
+from MXX.MxConfig.MxConfig.MxConfig import MxConfig
+from MXX.MxFile.MxReFile import MxReFile
+from MXX.MxFile.MxReFileGallery import MxReFileGallery
 
 from app.components.tree_frame import TreeFrame
 
 from app.common.style_sheet import StyleSheet
-from app.common.config import cfg
-from MXX.mxxfile.Path import Path
 from app.common.open_file import open_file
 from app.view.relabel_dialog import RelabelDialog
 from app.components.line_edit import LineEdit
@@ -61,14 +60,14 @@ class MesPanel(QFrame):
     def openFile(self):
         open_file(self._file.filePath())
 
-    def setMes(self, file:LabeledFile):
+    def setMes(self, file:MxReFile):
         self._file = file
         self.fileNameLabel.setText(file.fileName())
         self.frame.refresh(file)
 
 
 class CardView(QWidget):
-    def __init__(self, parent = None, file_gallery:FileGallery = None):
+    def __init__(self, parent = None, file_gallery:MxReFileGallery = None):
         super().__init__(parent=parent)
         self.cardViewlabel = QLabel(self.tr('未自动分类文件'), self)
         self.searchLineEdit = LineEdit(self)
@@ -88,14 +87,14 @@ class CardView(QWidget):
         self._current_idx = -1
         self.__initWidget()
 
-    def addCard(self, icon:FluentIcon, file:LabeledFile):
+    def addCard(self, icon:FluentIcon, file:MxReFile):
         card = FileCard(icon, file, self)
         card.clicked.connect(self.__setSelectedFile)
         self._cards.append(card)
         card.show()
         self.flowLayout.addWidget(card)
 
-    def __setSelectedFile(self, file:LabeledFile):
+    def __setSelectedFile(self, file:MxReFile):
         index = self._files.index(file)
         if self._current_idx >= 0:
             self._cards[self._current_idx].setSelected(False)
@@ -179,7 +178,7 @@ class CardView(QWidget):
 
 
 class UnlabeledInterface(MxxInterface):
-    def __init__(self, parent=None, file_gallery:FileGallery = None):
+    def __init__(self, parent=None, file_gallery:MxReFileGallery = None):
         super().__init__(
             title='未自动分类文件',
             subtitle = 'unlabeled files',

@@ -4,7 +4,13 @@ from MXX.MxLog.MxLog import MxLog
 
 class MxFile:
     def __init__(self, path:str = ''):
-        self._path = MxPath(path)
+        if isinstance(path, str):
+            self._path = MxPath(path)
+        elif isinstance(path, MxPath):
+            self._path = path
+        else:
+            MxLog().wrongLog('MxFile: path wrong in {}'.format(path))
+            return
         if not self.isFile:
             MxLog().wrongLog('MxFile: not a file in {}'.format(path))
 

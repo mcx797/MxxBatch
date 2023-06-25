@@ -56,5 +56,5 @@ class Config(QConfig):
 
 
 cfg = Config()
-qconfig.load('C:/Users/77902/Desktop/LeadingBatch/config/config.json', cfg)
-#qconfig.load('config/config.json', cfg)
+#qconfig.load('C:/Users/77902/Desktop/LeadingBatch/config/config.json', cfg)
+qconfig.load('config/config.json', cfg)

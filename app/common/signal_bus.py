@@ -7,10 +7,14 @@ class SignalBus(QObject):
 
     switchToSampleCard = pyqtSignal(str)
     supportSignal = pyqtSignal()
+
+    '''folder changed signal'''
     sourceFolderChangedSignal = pyqtSignal()
     targetFolderChangedSignal = pyqtSignal()
-    INTChangedSignal = pyqtSignal()
-    ruleChangedSignal = pyqtSignal()
+    paraFolderChangedSignal = pyqtSignal()
+    INTFolderChangedSignal = pyqtSignal()
+    ruleFolderChangedSignal = pyqtSignal()
+    logFolderChangedSignal = pyqtSignal()
 
 
 signalBus = SignalBus()

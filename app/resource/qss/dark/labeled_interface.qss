@@ -50,6 +50,12 @@ MesPanel>#fileNameLabel {
     color: white;
 }
 
+MesPanel>#fileTypeLabel {
+    font: 15px 'Segoe UI';
+    font-weight: bold;
+    color: white;
+}
+
 IconInfoPanel>#subTitleLabel {
     font: 14px 'Segoe UI', 'Microsoft YaHei';
     color: white;

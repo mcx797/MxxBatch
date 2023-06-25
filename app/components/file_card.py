@@ -2,19 +2,19 @@ from PyQt5.QtCore import Qt, pyqtSignal
 
 from PyQt5.QtWidgets import QFrame, QLabel, QVBoxLayout, QApplication
 
-from MXX.mxxfile.LabeledFile import LabeledFile
+from MXX.MxFile.MxReFile import MxReFile
 
 from qfluentwidgets import  FluentIcon, IconWidget, Theme, isDarkTheme
 
 
 class FileCard(QFrame):
-    clicked = pyqtSignal(LabeledFile)
+    clicked = pyqtSignal(MxReFile)
 
-    def __init__(self, icon: FluentIcon, file:LabeledFile, parent=None):
+    def __init__(self, icon: FluentIcon, file:MxReFile, parent=None):
         super().__init__(parent=parent)
         self._icon = icon
         self._file = file
-        self._content = file.fileSuffix()
+        self._content = file.fileSuffix
         self.isSelected = False
         self.iconWidget = IconWidget(icon, self)
         self.nameLabel = QLabel(self)

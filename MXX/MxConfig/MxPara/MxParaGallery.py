@@ -1,4 +1,5 @@
-from MXX.MxGallery.MxGallery import MxGallery, MxItem
+from MXX.MxGallery.MxGallery import MxGallery
+from MXX.MxGallery.MxItem import MxItem
 from MXX.MxFile.MxJsonFile import MxJsonFile
 from MXX.MxLog.MxLog import MxLog
 from enum import Enum
@@ -14,6 +15,8 @@ class MxParaGallery(MxGallery):
                 item = MxParaItem(self, json_file.filePath, name, con[name])
                 if item.name != None:
                     self.addItem(name, item)
+        else:
+            MxLog().wrongLog('para file format wrong in file:{}'.format(json_file.filePath))
 
 
 class MxParaItem(MxItem):
@@ -23,39 +26,51 @@ class MxParaItem(MxItem):
             self._name = None
             MxLog().wrongLog('para format wrong in item {}, file: {}'.format(name, path))
             return
-        if 'type' not in dic:
+
+        if not self.__loadType(dic):
             self._name = None
-            MxLog().wrongLog('para item has no key type in item: {}, file: {}'.format(name, path))
+            MxLog().wrongLog('para item key type wrong in item: {}, file: {}'.format(name, path))
             return
-        if not isinstance(dic['type'], str):
+
+        if not self.__loadValue(dic):
             self._name = None
-            MxLog.wrongLog('para item key type wrong in item: {}, file: {}'.format(name, path))
-        if 'value' not in dic:
-            self._name = None
-            MxLog().wrongLog('para item has no key value in item: {}, file: {}'.format(name, path))
+            MxLog().wrongLog('para item key value wrong in item: {}, file: {}'.format(name, path))
             return
-        if not isinstance(dic['value'], str):
-            self._name = None
-            MxLog().wrongLog('para item key str wrong in item: {}, file: {}'.format(name, path))
-            return
-        self._value = dic['value']
-        if dic['type'] == 'str':
-            self._type = MxParaType.STR
-        elif dic['type'] == 'option':
-            self._type = MxParaType.OPTION
+
+        if self._type == MxParaType.OPTION:
             if not self.__loadOption(dic):
                 self._name = None
                 MxLog().wrongLog('para item key option wrong in item: {}, file: {}'.format(name, path))
                 return
-        elif dic['type'] == 'combo':
+        elif self._type == MxParaType.COMBO:
             if not self.__loadCombo(dic):
                 self._name = None
                 MxLog().wrongLog('para item key combo wrong in item: {}, file: {}'.format(name, path))
                 return
+        return
+
+    def __loadValue(self, dic):
+        if 'value' not in dic:
+            return False
+        if not isinstance(dic['value'], str):
+            return False
+        self._value = dic['value']
+        return True
+
+    def __loadType(self, dic):
+        if 'type' not in dic:
+            return False
+        if not isinstance(dic['type'], str):
+            return False
+        if dic['type'] == 'str':
+            self._type = MxParaType.STR
+        elif dic['type'] == 'option':
+            self._type = MxParaType.OPTION
+        elif dic['type'] == 'combo':
             self._type = MxParaType.COMBO
         else:
-            MxLog().wrongLog('para item has unknown type in item: {}, file: {}'.format(name, path))
-            return
+            return False
+        return True
 
     def __loadOption(self, dic):
         if 'option' not in dic:
@@ -78,13 +93,13 @@ class MxParaItem(MxItem):
         for item in dic['para']:
             if not isinstance(item, str):
                 return False
-            if item not in self._parent._dic:
+            if not self._parent.isKey(item):
                 return False
             self._para.append(self._parent[item])
         return True
 
     def __str__(self):
-        ans = '{{file:{}, name:{}, type:{}, value:{}}}'.format(self._path, self._name, self._type, self.value)
+        ans = '{{type:{}, value:{}, file:{}}}'.format(self.type, self.value, self.path)
         return ans
 
     @property
@@ -96,6 +111,10 @@ class MxParaItem(MxItem):
             return self._value.format(para_list)
         else:
             return self._value
+
+    @property
+    def type(self):
+        return self._type
 
 
 class MxParaType(Enum):
@@ -110,3 +129,4 @@ if __name__ == '__main__':
     file = MxJsonFile(path)
     paras.loadJsonFile(file)
     print(paras)
+

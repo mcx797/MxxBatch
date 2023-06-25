@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QTreeWidgetItem, QTreeWidgetIte
 
 from qfluentwidgets import TreeWidget
 
-from MXX.mxxfile.LabeledFile import LabeledFile
+from MXX.MxFile.MxReFile import MxReFile
 
 from PyQt5.QtCore import Qt
 
-from MXX.mxxfile.Path import Path
+from MXX.MxPath.MxPath import MxPath
 
 from app.common.config import cfg
 
@@ -47,14 +47,15 @@ class TreeFrame(Frame):
                 it.value().setCheckState(0, Qt.Unchecked)
                 it += 1
 
-    def refresh(self, file:LabeledFile):
+    def refresh(self, file:MxReFile):
         self.tree.clear()
-        path_temp = Path(cfg.get(cfg.sourceFolder))
-        if len(file.path()) != 0:
-            itemTop = QTreeWidgetItem([self.tr(file.path()[len(path_temp) - 1])])
+        path_temp = MxPath(cfg.get(cfg.sourceFolder))
+        path_file = MxPath(file.filePath)
+        if len(path_file) != 0:
+            itemTop = QTreeWidgetItem([self.tr(path_file[len(path_temp) - 1])])
             itemTemp = itemTop
-            for i in range(len(path_temp), len(file.path())):
-                item1 = QTreeWidgetItem([self.tr(file.path()[i])])
+            for i in range(len(path_temp), len(path_file)):
+                item1 = QTreeWidgetItem([self.tr(path_file[i])])
                 itemTemp.addChild(item1)
                 itemTemp = item1
             self.tree.addTopLevelItem(itemTop)

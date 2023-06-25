@@ -1,22 +1,24 @@
 import os
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QFrame, QLabel, QVBoxLayout, QFileDialog
 from qfluentwidgets import IconWidget, TextWrap, SingleDirectionScrollArea
 
 from app.common.style_sheet import StyleSheet
 from app.common.config import cfg
-from MXX.mxxfile.Path import Path as MxxPath
+from MXX.MxPath.MxPath import MxPath
+from app.common.signal_bus import signalBus
 
 
 class LinkCard(QFrame):
+    clicked = pyqtSignal()
     def __init__(self, icon, title, url, signal, parent=None):
         super().__init__(parent=parent)
         self.setFixedSize(198, 220)
         self._iconWidget = IconWidget(icon, self)
         self._titleLabel = QLabel(title, self)
         self._url = url
-        self._path = MxxPath(cfg.get(self._url))
-        self._contentLabel = QLabel(self._path.linkCardPath(28), self)
+        self._path = MxPath(cfg.get(self._url))
+        self._contentLabel = QLabel(self._path.lenLimPath(28), self)
         self._signal = signal
         self._signal.connect(self.__refreshContent)
         self.__initWidget()
@@ -40,20 +42,9 @@ class LinkCard(QFrame):
 
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
-        url = ''
-        if os.path.isfile(cfg.get(self._url)):
-            fileLink = QFileDialog.getOpenFileName(
-                self, self.tr('Choose folder'), self._path.path()
-            )
-            print(fileLink[0])
-            url = fileLink[0]
-        else:
-            print('-------------------')
-            fileLink = QFileDialog.getExistingDirectory(
-                self, self.tr('Choose folder'), self._path.path()
-            )
-            print(fileLink)
-            url = fileLink
+        url = QFileDialog.getExistingDirectory(
+            self, self.tr('Choose folder'), self._path.dirPath
+        )
         self.folderChanged(url)
 
     def folderChanged(self, url):
@@ -62,9 +53,10 @@ class LinkCard(QFrame):
         cfg.set(self._url, url)
         self._signal.emit()
 
+
     def __refreshContent(self):
-        self._path = MxxPath(cfg.get(self._url))
-        self._contentLabel.setText(self._path.linkCardPath(28))
+        self._path = MxPath(cfg.get(self._url))
+        self._contentLabel.setText(self._path.lenLimPath(28))
         self.repaint()
 
 

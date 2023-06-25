@@ -28,19 +28,6 @@ class BannerWidget(QWidget):
         self.vBoxLayout.addWidget(self.galleryLabel)
         self.vBoxLayout.addWidget(self.linkCardView, 1, Qt.AlignBottom)
         self.vBoxLayout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        self.linkCardView.addCard(
-            FluentIcon.CODE,
-            self.tr('INT json file'),
-            cfg.INTFile,
-            signalBus.INTChangedSignal
-        )
-
-        self.linkCardView.addCard(
-            FluentIcon.CODE,
-            self.tr('Rule json file'),
-            cfg.ruleFile,
-            signalBus.ruleChangedSignal
-        )
 
         self.linkCardView.addCard(
             FluentIcon.FOLDER,
@@ -56,6 +43,12 @@ class BannerWidget(QWidget):
             signalBus.targetFolderChangedSignal
         )
 
+        self.linkCardView.addCard(
+            FluentIcon.CODE,
+            self.tr('LOG文件夹'),
+            cfg.logFolder,
+            signalBus.logFolderChangedSignal
+        )
 
     def paintEvent(self, e):
         super().paintEvent(e)
@@ -87,8 +80,9 @@ class BannerWidget(QWidget):
 
 
 class HomeInterface(ScrollArea):
-    def __init__(self, parent = None):
+    def __init__(self, parent = None, mx_cfg = None):
         super().__init__(parent=parent)
+        self._cfg = mx_cfg
         self.banner = BannerWidget(self)
         self.view = QWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
@@ -115,13 +109,14 @@ class HomeInterface(ScrollArea):
         self._file_label_view.addFileCard(
             icon = FIF.CHECKBOX,
             title="已分类文件",
-            content= self.tr("the number of labeled files is {}".format(10)),
+            content= self.tr("the number of labeled files is {}".format(self._cfg.labeledFileNum)),
             route_key = 'labeledInterface'
         )
         self._file_label_view.addFileCard(
             icon = FIF.DATE_TIME,
             title="未分类文件",
-            content = self.tr("the number of unlabeled files is {}".format(20)),
+            content = self.tr("the number of unlabeled files is {}".format(self._cfg.unlabeledFileNum)),
             route_key= 'unlabeledInterface'
         )
         self.vBoxLayout.addWidget(self._file_label_view)
+

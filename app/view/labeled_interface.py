@@ -13,22 +13,25 @@ from app.components.file_card import FileCard
 
 from app.view.mxx_interface import MxxInterface
 
-from MXX.mxxfile.FileGallery import FileGallery
-from MXX.mxxfile.LabeledFile import LabeledFile
-
+from MXX.MxFile.MxReFileGallery import MxReFileGallery
+from MXX.MxFile.MxReFile import MxReFile
+from MXX.MxConfig.MxConfig.MxConfig import MxConfig
 
 
 class MesPanel(QFrame):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self._file_name_label = QLabel(self.tr('文件名字.txt'))
+        self._file_type_label = QLabel(self.tr('文件类型'))
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(15, 5, 5, 5)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
         self.vBoxLayout.addWidget(self._file_name_label)
+        self.vBoxLayout.addWidget(self._file_type_label)
         self.setFixedWidth(500)
 
         self._file_name_label.setObjectName('fileNameLabel')
+        self._file_type_label.setObjectName('fileTypeLabel')
         self.frame = TreeFrame(self, False)
         self.vBoxLayout.addWidget(self.frame)
 
@@ -46,23 +49,25 @@ class MesPanel(QFrame):
         self._button_open_dir.clicked.connect(self.openDir)
 
     def openDir(self):
-        open_file(self._file.fileDir())
+        open_file(self._file.dirPath)
 
     def openFile(self):
-        open_file(self._file.filePath())
+        open_file(self._file.filePath)
 
-    def setMes(self, file:LabeledFile):
+    def setMes(self, file:MxReFile):
         self._file = file
-        self._file_name_label.setText(file.fileName())
+        self._file_name_label.setText(file.fileName)
+        self._file_type_label.setText(file.label)
         self.frame.refresh(file)
 
 
 class CardView(QWidget):
-    def __init__(self, parent = None, file_gallery:FileGallery = None):
+    def __init__(self, parent, mx_cfg: MxConfig):
         super().__init__(parent=parent)
+        self._mx_cfg = mx_cfg
         self._card_view_label = QLabel(self.tr('自动分类文件'), self)
         self._search_line_edit = LineEdit(self)
-        self._file_gallery = file_gallery
+
 
         self.view = QFrame(self)
         self.scrollArea = SmoothScrollArea(self.view)
@@ -74,7 +79,7 @@ class CardView(QWidget):
         self.flowLayout = FlowLayout(self.scrollWidget, isTight=False)
 
         self._cards = []
-        self._files = self._file_gallery.labeledFiles()
+        self._files = self._mx_cfg.labeledFiles
         self._current_idx = -1
         self.__initWidget()
 
@@ -103,12 +108,10 @@ class CardView(QWidget):
 
         self._search_line_edit.clearSignal.connect(self.showAllFiles)
         self._search_line_edit.searchSignal.connect(self.search)
-
         for file in self._files:
             self.addCard(FIF.FOLDER, file)
-
         for file in self._files:
-            if file.isLabeled():
+            if file.isLabeled:
                 self.__setSelectedFile(file)
                 break
 
@@ -118,14 +121,14 @@ class CardView(QWidget):
         self._card_view_label.setObjectName('cardViewLabel')
         StyleSheet.LABELED_INTERFACE.apply(self)
 
-    def addCard(self, icon:FluentIcon, file:LabeledFile):
+    def addCard(self, icon:FluentIcon, file:MxReFile):
         card = FileCard(icon, file, self)
         card.clicked.connect(self.__setSelectedFile)
         self._cards.append(card)
         card.show()
         self.flowLayout.addWidget(card)
 
-    def __setSelectedFile(self, file:LabeledFile):
+    def __setSelectedFile(self, file:MxReFile):
         index = self._files.index(file)
         if self._current_idx >= 0:
             self._cards[self._current_idx].setSelected(False)
@@ -168,19 +171,15 @@ class CardView(QWidget):
         self.repaint()
 
 
-
 class LabeledInterface(MxxInterface):
-    def __init__(self, parent=None, file_gallery:FileGallery = None):
+    def __init__(self, parent, mx_cfg:MxConfig):
         super().__init__(
+            parent = parent,
             title='自动分类文件',
             subtitle = 'labeled files',
-            parent = parent
+            mx_cfg=mx_cfg
         )
 
-        self._file_gallery = file_gallery
-        self._card_view = CardView(self, self._file_gallery)
+        self._card_view = CardView(self, self._mx_cfg)
         self.vBoxLayout.addWidget(self._card_view)
-
-
-
 

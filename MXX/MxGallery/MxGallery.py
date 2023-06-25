@@ -1,46 +1,35 @@
 from MXX.MxLog.MxLog import MxLog
+from MXX.MxGallery.MxItem import MxItem
 
 class MxGallery:
     def __init__(self, parent):
         self._parent = parent
-        self._dic = {}
+        self._items = {}
 
     def addItem(self, name, item):
         if name == None or item == None:
             return
-        if name in self._dic:
-            return
+        if name in self._items:
             MxLog().wrongLog('MXX.MxGallery.MxGallery:item name {} repeat.'.format(name))
-        self._dic[name] = item
+            return
+        self._items[name] = item
 
     def __len__(self):
-        return len(self._dic)
+        return len(self._items)
 
-    def __getitem__(self, item:str):
-        return self._dic[item]
+    def __getitem__(self, item):
+        if isinstance(item, str):
+            return self._items[item]
+        elif isinstance(item, MxItem):
+            return self._items[MxItem.name]
 
     def __str__(self):
-        ans = '{ '
-        for name in self._dic:
-            ans = ans + '{{name:{}, item:{}}}'.format(name, str(self._dic[name])) + ', '
-        ans = ans[:-2] + ' }'
+        ans = '[ '
+        for name in self._items:
+            ans = ans + '{{name:{}, item:{}}}'.format(name, str(self._items[name])) + ', '
+        ans = ans[:-2] + ' ]'
         return ans
 
+    def isKey(self, name):
+        return name in self._items
 
-class MxItem:
-    def __init__(self, parent, path, name):
-        self._parent = parent
-        self._path = path
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def path(self):
-        return self._path
-
-    @property
-    def parent(self):
-        return self._parent
