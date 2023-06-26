@@ -72,18 +72,15 @@ class MainWindow(FramelessWindow):
         self._home_interface = HomeInterface(self, self._config)
         self._setting_interface = SettingInterface(self)
         self._labeled_interface = LabeledInterface(self, self._config)
+        self._unlabeled_interface = UnlabeledInterface(self, self._config)
+        self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._config, self._label_dic)
 
+        self._type_labeled_interfaces = {}
 
-        #self._unlabeled_interface = UnlabeledInterface(self, self._file_gallery)
-        #self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._INT_type_dic)
+        for item in self._label_dic:
+            self._type_labeled_interfaces[item] = TypeLabeledInterface(self, self._config, item, self._label_dic[item])
+            self._type_labeled_interfaces[item].setObjectName('type_labeled_interfaces_{}'.format(item))
 
-        #self.labeled_file_interfaces_dic = {}
-        '''
-        for item in self._INT_type_dic:
-            print(item)
-            print(self._INT_type_dic[item])
-            self.labeled_file_interfaces_dic[item] = TypeLabeledInterface(self, item, self._INT_type_dic[item])
-        '''
 
         ''' Initialization '''
         self.initLayout()
@@ -97,7 +94,6 @@ class MainWindow(FramelessWindow):
 
         self._label_dic = self._config.labelDic
 
-        print(self._label_dic)
 
     def initLayout(self):
         self.hBoxLayout.setSpacing(0)
@@ -122,20 +118,19 @@ class MainWindow(FramelessWindow):
         self.addSubInterface(
             self._labeled_interface, 'labeledInterface', FIF.CHECKBOX, self.tr('labeled'), NavigationItemPosition.TOP)
 
-        '''
         self.addSubInterface(
             self._unlabeled_interface, 'unlabeledInterface', FIF.DATE_TIME, self.tr('Unlabeled'), NavigationItemPosition.TOP)
+
 
         self.addSubInterface(
             self._all_type_labeled_interface, 'allTypeLabeledInterface', FIF.CALENDAR, self.tr('all type'), NavigationItemPosition.TOP)
 
         self.navigationInterface.addSeparator()
 
-        for item in self._INT_type_dic:
+        for item in self._label_dic:
             self.addSubInterface(
-                self.labeled_file_interfaces_dic[item], '{}Interface'.format(item), FIF.DOCUMENT, self.tr(item))
-        '''
-
+                self._type_labeled_interfaces[item], 'type_labeled_interfaces_{}'.format(item), FIF.DOCUMENT,
+                self.tr(item))
 
         self.addSubInterface(
             self._setting_interface, 'settingInterface', FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)

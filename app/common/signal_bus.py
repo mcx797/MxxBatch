@@ -1,5 +1,6 @@
 # coding: utf-8
 from PyQt5.QtCore import QObject, pyqtSignal
+from MXX.MxFile.MxReFile import MxReFile
 
 
 class SignalBus(QObject):
@@ -15,6 +16,12 @@ class SignalBus(QObject):
     INTFolderChangedSignal = pyqtSignal()
     ruleFolderChangedSignal = pyqtSignal()
     logFolderChangedSignal = pyqtSignal()
+
+    autoUnlabeledSignal = pyqtSignal()
+    autoLabeledSignal = pyqtSignal()
+
+    homeMesRefresh = pyqtSignal()
+    fileLabeledSignal = pyqtSignal(MxReFile)
 
 
 signalBus = SignalBus()

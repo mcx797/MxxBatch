@@ -1,3 +1,4 @@
+HomeInterface,
 SettingInterface,
 #view {
     background-color: transparent;

@@ -49,9 +49,31 @@ class MxConfig:
     def __loadFiles(self, source_dir):
         self._re_file_gallery = MxReFileGallery(self, source_dir)
 
+    def typeFileNum(self, type_name):
+        return self._re_file_gallery.typeFileNum(type_name)
+
+    def typeFileList(self, label_name):
+        return self._re_file_gallery.typeFileList(label_name)
+
     @property
-    def labeledFiles(self):
-        return self._re_file_gallery.labeledFiles
+    def isFilesAllLabeled(self):
+        return self._re_file_gallery.isFilesAllLabeled
+
+    @property
+    def autoLabeledFiles(self):
+        return self._re_file_gallery.autoLabeledFiles
+
+    @property
+    def autoUnlabeledFiles(self):
+        return self._re_file_gallery.autoUnlabeledFiles
+
+    @property
+    def autoLabeledFilesNum(self):
+        return len(self._re_file_gallery.autoLabeledFiles)
+
+    @property
+    def autoUnlabeledFilesNum(self):
+        return len(self._re_file_gallery.autoUnlabeledFiles)
 
     @property
     def labelDic(self):

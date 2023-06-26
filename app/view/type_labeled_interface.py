@@ -1,20 +1,35 @@
 from app.view.mxx_interface import MxxInterface
 from app.components.home_card import HomeCardView, HomeCard
+from MXX.MxConfig.MxConfig.MxConfig import MxConfig
+from app.common.signal_bus import signalBus
+
+from MXX.MxFile.MxReFile import MxReFile
+from app.components.labeled_file_card import LabeledFileCardView, LabeledFileCard
+from app.common.style_sheet import StyleSheet
+
 
 class TypeLabeledInterface(MxxInterface):
-    def __init__(self, parent=None, type_name:str = 'wrong!', name_list:list = []):
+    def __init__(self, parent=None, mx_cfg: MxConfig = None, type_name:str = 'wrong!', name_list:list = []):
         super().__init__(
+            parent=parent,
             title='{}文件'.format(type_name),
-            subtitle='all type labeled files',
-            parent=parent
+            subtitle='{} type files'.format(type_name),
+            mx_cfg = mx_cfg
         )
+        self._type_name = type_name
         self._name_list = name_list
         self.loadNameList()
+        signalBus.fileLabeledSignal.connect(self.__addFileCard)
+
+    def __addFileCard(self, file:MxReFile):
+        if self._type_name == file.labelType:
+            self._name_view[file.labelItem].show()
+            self._name_view[file.labelItem].addCard(file)
 
     def loadNameList(self):
         self._name_view = {}
         for name in self._name_list:
-            self._name_view[name] = HomeCardView(
-                self.tr(name), self.view)
+            self._name_view[name] = LabeledFileCardView(self.view, self.tr(name))
             self.vBoxLayout.addWidget(self._name_view[name])
-            #self._name_view[name].hide()
+            self._name_view[name].hide()
+

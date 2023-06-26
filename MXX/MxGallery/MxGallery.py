@@ -14,6 +14,7 @@ class MxGallery:
             return
         self._items[name] = item
 
+
     def __len__(self):
         return len(self._items)
 

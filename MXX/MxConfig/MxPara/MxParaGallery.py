@@ -18,6 +18,9 @@ class MxParaGallery(MxGallery):
         else:
             MxLog().wrongLog('para file format wrong in file:{}'.format(json_file.filePath))
 
+    @property
+    def items(self):
+        return self._items
 
 class MxParaItem(MxItem):
     def __init__(self, parent, path, name, dic):
@@ -116,6 +119,11 @@ class MxParaItem(MxItem):
     def type(self):
         return self._type
 
+    @property
+    def option(self):
+        if self.type != MxParaType.OPTION:
+            return None
+        return self._option
 
 class MxParaType(Enum):
     STR = 0

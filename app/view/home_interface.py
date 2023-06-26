@@ -9,9 +9,12 @@ from app.components.link_card import LinkCardView, LinkCard
 from app.common.config import cfg
 from app.common.signal_bus import signalBus
 
-from app.components.home_card import HomeCardView, HomeCard
+from app.components.home_card import HomeFileCardView, HomeFileCard, HomeTypeCard, HomeTypeCardView
+from app.components.home_para_card import HomeParaCard, HomeParaCardView
 
 from qfluentwidgets import FluentIcon as FIF
+from MXX.MxFile.MxReFile import MxReFile
+from MXX.MxConfig.MxPara.MxParaGallery import MxParaGallery, MxParaType
 
 
 class BannerWidget(QWidget):
@@ -82,12 +85,17 @@ class BannerWidget(QWidget):
 class HomeInterface(ScrollArea):
     def __init__(self, parent = None, mx_cfg = None):
         super().__init__(parent=parent)
-        self._cfg = mx_cfg
+        self._mx_cfg = mx_cfg
+        self._label_dic = self._mx_cfg.labelDic
         self.banner = BannerWidget(self)
         self.view = QWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
 
         self.__initWidget()
+
+        signalBus.homeMesRefresh.connect(self.__homeMesRefresh)
+        signalBus.fileLabeledSignal.connect(self.__typeCardViewRefresh)
+
         self.loadHomeMes()
 
     def __initWidget(self):
@@ -104,19 +112,80 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout.setAlignment(Qt.AlignTop)
 
     def loadHomeMes(self):
-        self._file_label_view = HomeCardView(
-            self.tr("文件分类情况"), self.view)
-        self._file_label_view.addFileCard(
+        self._home_cards = {}
+        self.__initFileCard()
+        self.__initTypeCard()
+        self.__initParaCard()
+        self.vBoxLayout.addStretch(1)
+
+
+
+    def __initFileCard(self):
+        self._file_label_view = HomeFileCardView(
+            self.view, self.tr("文件分类情况"))
+        file_card = HomeFileCard(
             icon = FIF.CHECKBOX,
-            title="已分类文件",
-            content= self.tr("the number of labeled files is {}".format(self._cfg.labeledFileNum)),
-            route_key = 'labeledInterface'
-        )
-        self._file_label_view.addFileCard(
+            title = '已分类文件',
+            content = self.tr("自动分类文件数: {}\n分类文件数: {}"
+                              .format(self._mx_cfg.autoLabeledFilesNum, self._mx_cfg.labeledFileNum)),
+            route_key = 'labeledInterface')
+        self._file_label_view.addCard(file_card=file_card)
+        self._home_cards['labeled_file_card'] = file_card
+        file_card = HomeFileCard(
             icon = FIF.DATE_TIME,
-            title="未分类文件",
-            content = self.tr("the number of unlabeled files is {}".format(self._cfg.unlabeledFileNum)),
-            route_key= 'unlabeledInterface'
+            title = "未分类文件",
+            content = self.tr("未自动分类文件数: {}\n未分类文件数: {}"
+                              .format(self._mx_cfg.autoUnlabeledFilesNum, self._mx_cfg.unlabeledFileNum)),
+            route_key = 'unlabeledInterface'
         )
+        self._file_label_view.addCard(file_card=file_card)
+        self._home_cards['unlabeled_file_card'] = file_card
         self.vBoxLayout.addWidget(self._file_label_view)
 
+    def __initTypeCard(self):
+        self._type_file_view = HomeTypeCardView(
+            self.view, self.tr("类别文件数"))
+        for item in self._label_dic:
+            type_card = HomeTypeCard(
+                icon = FIF.DOCUMENT,
+                title = item,
+                content = self.tr('文件数: 0'),
+                route_key = 'type_labeled_interfaces_{}'.format(item)
+            )
+
+            type_card.hide()
+            self._type_file_view.addCard(type_card)
+            self._home_cards['type_card_{}'.format(item)] = type_card
+
+        self._type_file_view.hide()
+        self.vBoxLayout.addWidget(self._type_file_view)
+
+    def __initParaCard(self):
+        self._para_cards_view = HomeParaCardView(self.view)
+        para_gallery = self._mx_cfg.paraGallery
+        print(len(para_gallery))
+        for item in para_gallery.items:
+            if para_gallery[item].type == MxParaType.STR:
+                self._para_cards_view.addStrCard(para_gallery[item])
+            elif para_gallery[item].type == MxParaType.OPTION:
+                self._para_cards_view.addOptionCard(para_gallery[item])
+        self.vBoxLayout.addWidget(self._para_cards_view)
+
+
+    def __typeCardViewRefresh(self, file:MxReFile):
+        self._type_file_view.show()
+        label = file.label
+        if '_' in label:
+            type_name = label.split('_')[0]
+        else:
+            type_name = "Others"
+        card = self._home_cards['type_card_{}'.format(type_name)]
+        card.addFile()
+        card.show()
+
+
+    def __homeMesRefresh(self):
+        self._home_cards['labeled_file_card'].refreshCardCon(self.tr("自动分类文件数: {}\n分类文件数: {}"
+                                .format(self._mx_cfg.autoLabeledFilesNum, self._mx_cfg.labeledFileNum)))
+        self._home_cards['unlabeled_file_card'].refreshCardCon(self.tr("未自动分类文件数: {}\n未分类文件数: {}"
+                                .format(self._mx_cfg.autoUnlabeledFilesNum, self._mx_cfg.unlabeledFileNum)))

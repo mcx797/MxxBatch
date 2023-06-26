@@ -16,11 +16,14 @@ from app.view.mxx_interface import MxxInterface
 from MXX.MxFile.MxReFileGallery import MxReFileGallery
 from MXX.MxFile.MxReFile import MxReFile
 from MXX.MxConfig.MxConfig.MxConfig import MxConfig
+from app.view.relabel_dialog import RelabelDialog
+from app.common.signal_bus import signalBus
 
 
 class MesPanel(QFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, mx_cfg):
         super().__init__(parent=parent)
+        self._mx_cfg = mx_cfg
         self._file_name_label = QLabel(self.tr('文件名字.txt'))
         self._file_type_label = QLabel(self.tr('文件类型'))
         self.vBoxLayout = QVBoxLayout(self)
@@ -37,27 +40,59 @@ class MesPanel(QFrame):
 
         self._button_open_file = PrimaryPushButton(self.tr('打开文件'))
         self._button_open_dir = PrimaryPushButton(self.tr('打开文件夹'))
-        self._button_label = PrimaryPushButton(self.tr('更改分类'))
+        self._re_label = PrimaryPushButton(self.tr('更改分类'))
         self._ok_label = PrimaryPushButton(self.tr('确认分类'))
 
         self.vBoxLayout.addWidget(self._button_open_dir)
         self.vBoxLayout.addWidget(self._button_open_file)
-        self.vBoxLayout.addWidget(self._button_label)
+        self.vBoxLayout.addWidget(self._re_label)
         self.vBoxLayout.addWidget(self._ok_label)
 
         self._button_open_file.clicked.connect(self.openFile)
         self._button_open_dir.clicked.connect(self.openDir)
+        self._re_label.clicked.connect(self.reLabel)
+        self._ok_label.clicked.connect(self.okLabel)
+
+    def reLabel(self):
+        if not isinstance(self._file, MxReFile):
+            return
+        w = RelabelDialog(self._mx_cfg.labelDic)
+        w.show()
+        w.exec_()
+        if self._file.isLabeled:
+            return
+        if w.isOk:
+            self._file.setLabel(w.typeName)
+            signalBus.fileLabeledSignal.emit(self._file)
+            self._file = None
+            signalBus.autoLabeledSignal.emit()
+        w.deleteLater()
+
+
+    def okLabel(self):
+        if not isinstance(self._file, MxReFile):
+            return
+        if self._file.isLabeled:
+            return
+        self._file.setLabel(self._file.autoLabel)
+        signalBus.fileLabeledSignal.emit(self._file)
+        self._file = None
+        signalBus.autoLabeledSignal.emit()
 
     def openDir(self):
+        if not isinstance(self._file, MxReFile):
+            return
         open_file(self._file.dirPath)
 
     def openFile(self):
+        if not isinstance(self._file, MxReFile):
+            return
         open_file(self._file.filePath)
 
     def setMes(self, file:MxReFile):
         self._file = file
         self._file_name_label.setText(file.fileName)
-        self._file_type_label.setText(file.label)
+        self._file_type_label.setText(file.autoLabel)
         self.frame.refresh(file)
 
 
@@ -67,19 +102,19 @@ class CardView(QWidget):
         self._mx_cfg = mx_cfg
         self._card_view_label = QLabel(self.tr('自动分类文件'), self)
         self._search_line_edit = LineEdit(self)
+        self._mes_panel = MesPanel(self, mx_cfg)
 
 
         self.view = QFrame(self)
         self.scrollArea = SmoothScrollArea(self.view)
         self.scrollWidget = QWidget(self.scrollArea)
-        self.mesPanel = MesPanel(self)
 
         self.vBoxLayout = QVBoxLayout(self)
         self.hBoxLayout = QHBoxLayout(self.view)
         self.flowLayout = FlowLayout(self.scrollWidget, isTight=False)
 
         self._cards = []
-        self._files = self._mx_cfg.labeledFiles
+        self._files = self._mx_cfg.autoLabeledFiles
         self._current_idx = -1
         self.__initWidget()
 
@@ -98,7 +133,7 @@ class CardView(QWidget):
         self.hBoxLayout.setSpacing(0)
         self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.hBoxLayout.addWidget(self.scrollArea)
-        self.hBoxLayout.addWidget(self.mesPanel, 0, Qt.AlignRight)
+        self.hBoxLayout.addWidget(self._mes_panel, 0, Qt.AlignRight)
 
         self.flowLayout.setVerticalSpacing(8)
         self.flowLayout.setHorizontalSpacing(8)
@@ -108,10 +143,12 @@ class CardView(QWidget):
 
         self._search_line_edit.clearSignal.connect(self.showAllFiles)
         self._search_line_edit.searchSignal.connect(self.search)
+        signalBus.autoLabeledSignal.connect(self.__fileLabeled)
+
         for file in self._files:
             self.addCard(FIF.FOLDER, file)
         for file in self._files:
-            if file.isLabeled:
+            if file.isAutoLabeled:
                 self.__setSelectedFile(file)
                 break
 
@@ -134,12 +171,12 @@ class CardView(QWidget):
             self._cards[self._current_idx].setSelected(False)
         self._current_idx = index
         self._cards[index].setSelected(True)
-        self.mesPanel.setMes(file)
+        self._mes_panel.setMes(file)
 
     def search(self, key_word: str):
         indexes = []
         for i, file in enumerate(self._files):
-            if file.searchLabeled(key_word):
+            if file.searchAutoLabeled(key_word):
                 indexes.append(i)
 
         for i, card in enumerate(self._cards):
@@ -156,8 +193,11 @@ class CardView(QWidget):
     def showAllFiles(self):
         indexes = []
         for i, file in enumerate(self._files):
-            if file.isLabeled():
-                indexes.append(i)
+            if not file.isAutoLabeled:
+                continue
+            if file.isLabeled:
+                continue
+            indexes.append(i)
 
         for i, card in enumerate(self._cards):
             isVisible = i in indexes
@@ -170,6 +210,30 @@ class CardView(QWidget):
 
         self.repaint()
 
+    def __fileLabeled(self):
+        indexes = []
+        for i, file in enumerate(self._files):
+            if not file.isAutoLabeled:
+                continue
+            if file.isLabeled:
+                continue
+            indexes.append(i)
+
+        signalBus.homeMesRefresh.emit()
+
+        if indexes == []:
+            signalBus.switchToSampleCard.emit('homeInterface')
+
+        for i, card in enumerate(self._cards):
+            isVisible = i in indexes
+            if isVisible:
+                card.show()
+            else:
+                card.hide()
+        if len(indexes) > 0:
+            self.__setSelectedFile(self._files[indexes[0]])
+
+        self.repaint()
 
 class LabeledInterface(MxxInterface):
     def __init__(self, parent, mx_cfg:MxConfig):

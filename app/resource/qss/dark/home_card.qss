@@ -9,6 +9,18 @@ HomeCard:hover {
     border-color: rgb(37, 37, 37);
 }
 
+LabeledFileCard {
+    border: 1px solid rgb(35, 35, 35);
+    border-radius: 6px;
+    background-color: rgb(50, 50, 50);
+}
+
+LabeledFileCard:hover {
+    background-color: rgb(62, 62, 62);
+    border-color: rgb(37, 37, 37);
+}
+
+
 
 #titleLabel {
     color: white;

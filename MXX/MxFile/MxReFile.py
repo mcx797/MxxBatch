@@ -7,14 +7,56 @@ class MxReFile(MxFile):
         if label == None:
             self._is_auto_labeled = False
             self._is_labeled = False
-            self._label_list = []
-            self._label = 'Unknown'
+            self._auto_label = 'did not auto identified'
+            self._label = None
         else:
             self._is_auto_labeled = True
-            self._is_labeled = True
-            self._label_list = []
-            self._label = label
-            self._label_list.append(label)
+            self._is_labeled = False
+            self._auto_label = label
+            self._label = None
+
+    def setLabel(self, label):
+        self._is_labeled = True
+        self._label = label
+        return
+
+    def searchAutoUnlabeled(self, key_word):
+        if self.isAutoLabeled:
+            return False
+        if self.isLabeled:
+            return False
+        path = self._path
+        for i in range(len(path)):
+            if key_word in path[i]:
+                return True
+        return False
+
+    def searchAutoLabeled(self, key_word):
+        if not self.isAutoLabeled:
+            return False
+        if self.isLabeled:
+            return False
+        path = self._path
+        for i in range(len(path)):
+            if key_word in path[i]:
+                return True
+        if '_' in self._auto_label:
+            items = self._auto_label.split('_')
+            for item in items:
+                if key_word in item:
+                    return True
+        else:
+            if key_word in self._auto_label:
+                return True
+        return False
+
+    @property
+    def isAutoLabeled(self):
+        return self._is_auto_labeled
+
+    @property
+    def autoLabel(self):
+        return self._auto_label
 
     @property
     def isLabeled(self):
@@ -23,3 +65,17 @@ class MxReFile(MxFile):
     @property
     def label(self):
         return self._label
+
+    @property
+    def labelType(self):
+        if '_' in self._label:
+            return self._label.split('_')[0]
+        else:
+            return 'Others'
+
+    @property
+    def labelItem(self):
+        if '_' in self._label:
+            return self._label.split('_')[1]
+        else:
+            return self._label

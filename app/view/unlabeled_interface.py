@@ -20,18 +20,20 @@ from app.common.open_file import open_file
 from app.view.relabel_dialog import RelabelDialog
 from app.components.line_edit import LineEdit
 from app.components.file_card import FileCard
+from app.common.signal_bus import signalBus
 
 
 class MesPanel(QFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, mx_cfg):
         super().__init__(parent=parent)
-        self.fileNameLabel = QLabel(self.tr('文件名字.txt'))
+        self._mx_cfg = mx_cfg
+        self._file_name_label = QLabel(self.tr('文件名字.txt'))
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(15, 5, 5, 5)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
-        self.vBoxLayout.addWidget(self.fileNameLabel)
+        self.vBoxLayout.addWidget(self._file_name_label)
         self.setFixedWidth(500)
-        self.fileNameLabel.setObjectName('fileNameLabel')
+        self._file_name_label.setObjectName('fileNameLabel')
         self.frame = TreeFrame(self, False)
         self.vBoxLayout.addWidget(self.frame)
 
@@ -49,43 +51,117 @@ class MesPanel(QFrame):
         self._button_label.clicked.connect(self.reLabel)
 
     def reLabel(self):
-        w = RelabelDialog()
+        if not isinstance(self._file, MxReFile):
+            return
+        w = RelabelDialog(self._mx_cfg.labelDic)
         w.show()
         w.exec_()
-        print(w._type_items[w._type_idx])
+        if self._file.isLabeled:
+            return
+        if w.isOk:
+            self._file.setLabel(w.typeName)
+            signalBus.fileLabeledSignal.emit(self._file)
+            self._file = None
+            signalBus.autoUnlabeledSignal.emit()
+        w.deleteLater()
 
     def openDir(self):
-        open_file(self._file.fileDir())
+        if not isinstance(self._file, MxReFile):
+            return
+        open_file(self._file.dirPath)
 
     def openFile(self):
-        open_file(self._file.filePath())
+        if not isinstance(self._file, MxReFile):
+            return
+        open_file(self._file.filePath)
 
     def setMes(self, file:MxReFile):
         self._file = file
-        self.fileNameLabel.setText(file.fileName())
+        self._file_name_label.setText(file.fileName)
         self.frame.refresh(file)
 
 
 class CardView(QWidget):
-    def __init__(self, parent = None, file_gallery:MxReFileGallery = None):
+    def __init__(self, parent, mx_cfg:MxConfig):
         super().__init__(parent=parent)
-        self.cardViewlabel = QLabel(self.tr('未自动分类文件'), self)
-        self.searchLineEdit = LineEdit(self)
-        self._file_gallery = file_gallery
+        self._mx_cfg = mx_cfg
+        self._card_view_label = QLabel(self.tr('未自动分类文件'), self)
+        self._search_line_edit = LineEdit(self)
+        self._mes_panel = MesPanel(self, mx_cfg)
 
         self.view = QFrame(self)
         self.scrollArea = SmoothScrollArea(self.view)
         self.scrollWidget = QWidget(self.scrollArea)
-        self.mesPanel = MesPanel(self)
+
 
         self.vBoxLayout = QVBoxLayout(self)
         self.hBoxLayout = QHBoxLayout(self.view)
         self.flowLayout = FlowLayout(self.scrollWidget, isTight=False)
 
         self._cards = []
-        self._files = self._file_gallery.unlabeledFiles()
+        self._files = self._mx_cfg.autoUnlabeledFiles
         self._current_idx = -1
         self.__initWidget()
+
+    def __initWidget(self):
+        self.scrollArea.setWidget(self.scrollWidget)
+        self.scrollArea.setViewportMargins(0, 5, 0, 5)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
+        self.vBoxLayout.setSpacing(12)
+        self.vBoxLayout.addWidget(self._card_view_label)
+        self.vBoxLayout.addWidget(self._search_line_edit)
+        self.vBoxLayout.addWidget(self.view)
+
+        self.hBoxLayout.setSpacing(0)
+        self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
+        self.hBoxLayout.addWidget(self.scrollArea)
+        self.hBoxLayout.addWidget(self._mes_panel, 0, Qt.AlignRight)
+
+        self.flowLayout.setVerticalSpacing(8)
+        self.flowLayout.setHorizontalSpacing(8)
+        self.flowLayout.setContentsMargins(8, 3, 8, 8)
+
+        self.__setQss()
+
+        self._search_line_edit.clearSignal.connect(self.showAllFiles)
+        self._search_line_edit.searchSignal.connect(self.search)
+        signalBus.autoUnlabeledSignal.connect(self.__fileLabeled)
+
+        for file in self._files:
+            self.addCard(FIF.FOLDER, file)
+
+        for file in self._files:
+            if not file.isAutoLabeled:
+                self.__setSelectedFile(file)
+                break
+
+    def __fileLabeled(self):
+        indexes = []
+        for i, file in enumerate(self._files):
+            if file.isLabeled:
+                continue
+            if file.isAutoLabeled:
+                continue
+            indexes.append(i)
+
+        signalBus.homeMesRefresh.emit()
+
+        if indexes == []:
+            signalBus.switchToSampleCard.emit('homeInterface')
+
+        for i, card in enumerate(self._cards):
+            isVisible = i in indexes
+            if isVisible:
+                card.show()
+            else:
+                card.hide()
+        if len(indexes) > 0:
+            self.__setSelectedFile(self._files[indexes[0]])
+
+        self.repaint()
 
     def addCard(self, icon:FluentIcon, file:MxReFile):
         card = FileCard(icon, file, self)
@@ -100,52 +176,18 @@ class CardView(QWidget):
             self._cards[self._current_idx].setSelected(False)
         self._current_idx = index
         self._cards[index].setSelected(True)
-        self.mesPanel.setMes(file)
-
-    def __initWidget(self):
-        self.scrollArea.setWidget(self.scrollWidget)
-        self.scrollArea.setViewportMargins(0, 5, 0, 5)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.vBoxLayout.setSpacing(12)
-        self.vBoxLayout.addWidget(self.cardViewlabel)
-        self.vBoxLayout.addWidget(self.searchLineEdit)
-        self.vBoxLayout.addWidget(self.view)
-
-        self.hBoxLayout.setSpacing(0)
-        self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.hBoxLayout.addWidget(self.scrollArea)
-        self.hBoxLayout.addWidget(self.mesPanel, 0, Qt.AlignRight)
-
-        self.flowLayout.setVerticalSpacing(8)
-        self.flowLayout.setHorizontalSpacing(8)
-        self.flowLayout.setContentsMargins(8, 3, 8, 8)
-
-        self.__setQss()
-
-        self.searchLineEdit.clearSignal.connect(self.showAllFiles)
-        self.searchLineEdit.searchSignal.connect(self.search)
-
-        for file in self._files:
-            self.addCard(FIF.FOLDER, file)
-
-        for file in self._files:
-            if not file.isLabeled():
-                self.__setSelectedFile(file)
-                break
+        self._mes_panel.setMes(file)
 
     def __setQss(self):
         self.view.setObjectName('cardView')
         self.scrollWidget.setObjectName('scrollWidget')
-        self.cardViewlabel.setObjectName('cardViewLabel')
+        self._card_view_label.setObjectName('cardViewLabel')
         StyleSheet.UNLABELED_INTERFACE.apply(self)
 
     def search(self, keyWord: str):
         indexes = []
         for i, file in enumerate(self._files):
-            if file.searchUnlabeled(keyWord):
+            if file.searchAutoUnlabeled(keyWord):
                 indexes.append(i)
 
         for i, card in enumerate(self._cards):
@@ -158,12 +200,14 @@ class CardView(QWidget):
             self.__setSelectedFile(self._files[indexes[0]])
         self.repaint()
 
-
     def showAllFiles(self):
         indexes = []
         for i, file in enumerate(self._files):
-            if not file.isLabeled():
-                indexes.append(i)
+            if file.isLabeled:
+                continue
+            if file.isAutoLabeled:
+                continue
+            indexes.append(i)
 
         for i, card in enumerate(self._cards):
             isVisible = i in indexes
@@ -178,13 +222,13 @@ class CardView(QWidget):
 
 
 class UnlabeledInterface(MxxInterface):
-    def __init__(self, parent=None, file_gallery:MxReFileGallery = None):
+    def __init__(self, parent, mx_cfg:MxConfig):
         super().__init__(
+            parent=parent,
             title='未自动分类文件',
             subtitle = 'unlabeled files',
-            parent = parent
+            mx_cfg=mx_cfg
         )
-        self._file_gallery = file_gallery
-        self._cardView = CardView(self, file_gallery)
-        self.vBoxLayout.addWidget(self._cardView)
+        self._card_view = CardView(self, self._mx_cfg)
+        self.vBoxLayout.addWidget(self._card_view)
 

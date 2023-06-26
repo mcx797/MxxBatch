@@ -2,8 +2,12 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QFrame, QHBoxLayout, QVBoxLayout
 from qfluentwidgets import FlowLayout, IconWidget, TextWrap
 
+from MXX.MxConfig.MxConfig.MxConfig import MxConfig
+from MXX.MxConfig.MxPara.MxParaGallery import MxParaItem
+
 from app.common.style_sheet import StyleSheet
 from app.common.signal_bus import signalBus
+from qfluentwidgets import FluentIcon as FIF
 
 
 class HomeCard(QFrame):
@@ -11,7 +15,7 @@ class HomeCard(QFrame):
         super().__init__(parent=parent)
         self._icon_widget = IconWidget(icon, self)
         self._title_label = QLabel(title, self)
-        self._content_label = QLabel(TextWrap.wrap(content, 45, False)[0], self)
+        self._content_label = QLabel(content, self)
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
         self.setFixedSize(360, 90)
@@ -38,10 +42,31 @@ class HomeCard(QFrame):
         super().mouseReleaseEvent(e)
 
 
-class FileHomeCard(HomeCard):
+class HomeFileCard(HomeCard):
     def __init__(self, icon, title, content, route_key, parent = None):
         super().__init__(icon, title, content, parent)
         self._route_key = route_key
+
+    def refreshCardCon(self, str):
+        self._content_label.setText(str)
+
+    def mouseReleaseEvent(self, e):
+        super().mouseReleaseEvent(e)
+        signalBus.switchToSampleCard.emit(self._route_key)
+
+
+class HomeTypeCard(HomeCard):
+    def __init__(self, icon, title, content, route_key, parent = None):
+        super().__init__(icon, title, content, parent)
+        self._route_key = route_key
+        self._file_num = 0
+
+    def refreshCardCon(self, str):
+        self._content_label.setText(str)
+
+    def addFile(self):
+        self._file_num = self._file_num + 1
+        self.refreshCardCon("文件数: {}".format(self._file_num))
 
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
@@ -49,7 +74,7 @@ class FileHomeCard(HomeCard):
 
 
 class HomeCardView(QWidget):
-    def __init__(self, title: str, parent=None):
+    def __init__(self, parent, title:str):
         super().__init__(parent = parent)
         self.titleLabel = QLabel(title, self)
         self.vBoxLayout = QVBoxLayout(self)
@@ -74,7 +99,25 @@ class HomeCardView(QWidget):
         self.flowLayout.addWidget(card)
         self._cards.append(card)
 
-    def addFileCard(self, icon, title, content, route_key):
-        card = FileHomeCard(icon, title, content, route_key, self)
+
+class HomeFileCardView(HomeCardView):
+    def __init__(self, parent, title:str):
+        super().__init__(parent=parent, title=title)
+
+    def addCard(self, file_card:HomeFileCard):
+        card = file_card
         self.flowLayout.addWidget(card)
         self._cards.append(card)
+
+
+class HomeTypeCardView(HomeCardView):
+    def __init__(self, parent, title:str):
+        super().__init__(parent=parent, title=title)
+
+    def addCard(self, type_card: HomeTypeCard):
+        card = type_card
+        self.flowLayout.addWidget(card)
+        self._cards.append(card)
+
+
+
