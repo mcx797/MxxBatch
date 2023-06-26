@@ -27,6 +27,8 @@ class MxConfig:
 
     def __loadParas(self, para_dir):
         self._para_gallery = MxParaGallery(self)
+        if not os.path.isdir(para_dir):
+            return
         for file in os.listdir(para_dir):
             path = para_dir + '/' + file
             json_file = MxJsonFile(path)
@@ -34,6 +36,8 @@ class MxConfig:
 
     def __loadINTs(self, INT_dir):
         self._INT_gallery = MxINTGallery(self)
+        if not os.path.isdir(INT_dir):
+            return
         for file in os.listdir(INT_dir):
             path = INT_dir + '/' + file
             json_file = MxJsonFile(path)
@@ -41,6 +45,8 @@ class MxConfig:
 
     def __loadRules(self, rule_dir):
         self._rule_gallery = MxRuleGallery(self)
+        if not os.path.isdir(rule_dir):
+            return
         for file in os.listdir(rule_dir):
             path = rule_dir + '/' + file
             json_file = MxJsonFile(path)

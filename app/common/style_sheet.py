@@ -15,8 +15,9 @@ class StyleSheet(StyleSheetBase, Enum):
     MXX_INTERFACE = "mxx_interface"
     UNLABELED_INTERFACE = 'unlabeled_interface'
     LABELED_INTERFACE = 'labeled_interface'
+    RELABEL_DIALOG = 'relabel_dialog'
 
     def path(self, theme=Theme.AUTO):
         theme = qconfig.theme if theme == Theme.AUTO else theme
-        #return f":/LeadingBatch/qss/{theme.value.lower()}/{self.value}.qss"
-        return f".\\app\\resource\\qss\\{theme.value.lower()}\\{self.value}.qss"
+        return f":/MXX/qss/{theme.value.lower()}/{self.value}.qss"
+        #return f".\\app\\resource\\qss\\{theme.value.lower()}\\{self.value}.qss"

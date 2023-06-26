@@ -19,7 +19,7 @@ class MxJsonFile(MxFile):
         try:
             ans = json.load(file)
         except:
-            MxLog().wrongLog('MXX.MxJsonFile.MxJsonFile.py: json format wrong in {}'.format(self.path))
+            MxLog().wrongLog('MxJsonFile.MxJsonFile.py: load json file wrong')
         file.close()
         return ans
 

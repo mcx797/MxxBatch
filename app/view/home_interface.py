@@ -2,12 +2,14 @@ from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPixmap, QPainter, QPainterPath, QColor, QBrush
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 
-from qfluentwidgets import ScrollArea, isDarkTheme, FluentIcon
+from qfluentwidgets import ScrollArea, isDarkTheme, FluentIcon, InfoBar
 
 from app.common.style_sheet import StyleSheet
 from app.components.link_card import LinkCardView, LinkCard
 from app.common.config import cfg
 from app.common.signal_bus import signalBus
+
+from app.common import src
 
 from app.components.home_card import HomeFileCardView, HomeFileCard, HomeTypeCard, HomeTypeCardView
 from app.components.home_para_card import HomeParaCard, HomeParaCardView
@@ -23,7 +25,7 @@ class BannerWidget(QWidget):
         self.setFixedHeight(336)
         self.vBoxLayout = QVBoxLayout(self)
         self.galleryLabel = QLabel('Config Gallery', self)
-        self.banner = QPixmap(':/LeadingBatch/images/header1.png')
+        self.banner = QPixmap(':/MXX/images/header1.png')
         self.linkCardView = LinkCardView(self)
         self.galleryLabel.setObjectName('galleryLabel')
         self.vBoxLayout.setSpacing(0)
@@ -36,21 +38,40 @@ class BannerWidget(QWidget):
             FluentIcon.FOLDER,
             self.tr('源文件夹'),
             cfg.sourceFolder,
-            signalBus.sourceFolderChangedSignal
+            signalBus.sourceFolderChangedSignal,
+            ''
         )
 
         self.linkCardView.addCard(
             FluentIcon.FOLDER,
             self.tr('目标文件夹'),
             cfg.targetFolder,
-            signalBus.targetFolderChangedSignal
+            signalBus.targetFolderChangedSignal,
+            ''
         )
 
         self.linkCardView.addCard(
             FluentIcon.CODE,
-            self.tr('LOG文件夹'),
-            cfg.logFolder,
-            signalBus.logFolderChangedSignal
+            self.tr('参数文件夹'),
+            cfg.paraFolder,
+            signalBus.paraFolderChangedSignal,
+            '/para'
+        )
+
+        self.linkCardView.addCard(
+            FluentIcon.CODE,
+            self.tr('INT文件夹'),
+            cfg.INTFolder,
+            signalBus.INTFolderChangedSignal,
+            '/INT'
+        )
+
+        self.linkCardView.addCard(
+            FluentIcon.CODE,
+            self.tr('规则文件夹'),
+            cfg.ruleFolder,
+            signalBus.ruleFolderChangedSignal,
+            "/rule"
         )
 
     def paintEvent(self, e):
@@ -96,7 +117,20 @@ class HomeInterface(ScrollArea):
         signalBus.homeMesRefresh.connect(self.__homeMesRefresh)
         signalBus.fileLabeledSignal.connect(self.__typeCardViewRefresh)
 
+        signalBus.ruleFolderChangedSignal.connect(self.__showRestartTooltip)
+        signalBus.INTFolderChangedSignal.connect(self.__showRestartTooltip)
+        signalBus.paraFolderChangedSignal.connect(self.__showRestartTooltip)
+
         self.loadHomeMes()
+
+    def __showRestartTooltip(self):
+        """ show restart tooltip """
+        InfoBar.success(
+            self.tr('Updated successfully'),
+            self.tr('Configuration takes effect after restart'),
+            duration=5500,
+            parent=self
+        )
 
     def __initWidget(self):
         self.view.setObjectName('view')
@@ -163,7 +197,6 @@ class HomeInterface(ScrollArea):
     def __initParaCard(self):
         self._para_cards_view = HomeParaCardView(self.view)
         para_gallery = self._mx_cfg.paraGallery
-        print(len(para_gallery))
         for item in para_gallery.items:
             if para_gallery[item].type == MxParaType.STR:
                 self._para_cards_view.addStrCard(para_gallery[item])

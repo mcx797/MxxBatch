@@ -1,8 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QVBoxLayout, QHBoxLayout
-
 from qfluentwidgets import (SmoothScrollArea, FlowLayout, PrimaryPushButton, FluentIcon)
-
 from qfluentwidgets import FluentIcon as FIF
 
 from app.components.line_edit import LineEdit
@@ -10,12 +8,12 @@ from app.common.style_sheet import StyleSheet
 from app.common.open_file import open_file
 from app.components.tree_frame import TreeFrame
 from app.components.file_card import FileCard
-
 from app.view.mxx_interface import MxxInterface
 
 from MXX.MxFile.MxReFileGallery import MxReFileGallery
 from MXX.MxFile.MxReFile import MxReFile
 from MXX.MxConfig.MxConfig.MxConfig import MxConfig
+
 from app.view.relabel_dialog import RelabelDialog
 from app.common.signal_bus import signalBus
 
@@ -27,31 +25,39 @@ class MesPanel(QFrame):
         self._file_name_label = QLabel(self.tr('文件名字.txt'))
         self._file_type_label = QLabel(self.tr('文件类型'))
         self.vBoxLayout = QVBoxLayout(self)
-        self.vBoxLayout.setContentsMargins(15, 5, 5, 5)
-        self.vBoxLayout.setAlignment(Qt.AlignTop)
-        self.vBoxLayout.addWidget(self._file_name_label)
-        self.vBoxLayout.addWidget(self._file_type_label)
+
         self.setFixedWidth(500)
+        self.height()
 
         self._file_name_label.setObjectName('fileNameLabel')
         self._file_type_label.setObjectName('fileTypeLabel')
         self.frame = TreeFrame(self, False)
-        self.vBoxLayout.addWidget(self.frame)
 
         self._button_open_file = PrimaryPushButton(self.tr('打开文件'))
         self._button_open_dir = PrimaryPushButton(self.tr('打开文件夹'))
         self._re_label = PrimaryPushButton(self.tr('更改分类'))
         self._ok_label = PrimaryPushButton(self.tr('确认分类'))
 
-        self.vBoxLayout.addWidget(self._button_open_dir)
-        self.vBoxLayout.addWidget(self._button_open_file)
-        self.vBoxLayout.addWidget(self._re_label)
-        self.vBoxLayout.addWidget(self._ok_label)
-
         self._button_open_file.clicked.connect(self.openFile)
         self._button_open_dir.clicked.connect(self.openDir)
         self._re_label.clicked.connect(self.reLabel)
         self._ok_label.clicked.connect(self.okLabel)
+        self.__initWidget()
+
+    def __initWidget(self):
+        self.vBoxLayout.setContentsMargins(15, 5, 5, 5)
+        self.vBoxLayout.setAlignment(Qt.AlignTop)
+        self.vBoxLayout.addWidget(self._file_name_label)
+        self.vBoxLayout.addSpacing(5)
+        self.vBoxLayout.addWidget(self._file_type_label)
+        self.vBoxLayout.addSpacing(5)
+        self.vBoxLayout.addWidget(self.frame)
+        self.vBoxLayout.addStretch(1)
+        self.vBoxLayout.addWidget(self._button_open_dir)
+        self.vBoxLayout.addWidget(self._button_open_file)
+        self.vBoxLayout.addWidget(self._re_label)
+        self.vBoxLayout.addWidget(self._ok_label)
+        self.vBoxLayout.addSpacing(5)
 
     def reLabel(self):
         if not isinstance(self._file, MxReFile):
@@ -67,7 +73,6 @@ class MesPanel(QFrame):
             self._file = None
             signalBus.autoLabeledSignal.emit()
         w.deleteLater()
-
 
     def okLabel(self):
         if not isinstance(self._file, MxReFile):
@@ -103,7 +108,6 @@ class CardView(QWidget):
         self._card_view_label = QLabel(self.tr('自动分类文件'), self)
         self._search_line_edit = LineEdit(self)
         self._mes_panel = MesPanel(self, mx_cfg)
-
 
         self.view = QFrame(self)
         self.scrollArea = SmoothScrollArea(self.view)
@@ -234,6 +238,7 @@ class CardView(QWidget):
             self.__setSelectedFile(self._files[indexes[0]])
 
         self.repaint()
+
 
 class LabeledInterface(MxxInterface):
     def __init__(self, parent, mx_cfg:MxConfig):

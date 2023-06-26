@@ -48,14 +48,6 @@ class SettingInterface(ScrollArea):
             self.folderGroup
         )
 
-        self.logFolderCard = PushSettingCard(
-            self.tr('Choose folder'),
-            FIF.FOLDER,
-            self.tr("log directory"),
-            cfg.get(cfg.logFolder),
-            self.folderGroup
-        )
-
         self.sourceFolderCard = PushSettingCard(
             self.tr('Choose folder'),
             FIF.FOLDER,
@@ -148,7 +140,6 @@ class SettingInterface(ScrollArea):
         self.folderGroup.addSettingCard(self.paraFolderCard)
         self.folderGroup.addSettingCard(self.INTFolderCard)
         self.folderGroup.addSettingCard(self.ruleFolderCard)
-        self.folderGroup.addSettingCard(self.logFolderCard)
         self.folderGroup.addSettingCard(self.sourceFolderCard)
         self.folderGroup.addSettingCard(self.targetFolderCard)
 
@@ -175,9 +166,6 @@ class SettingInterface(ScrollArea):
         self.ruleFolderCard.clicked.connect(
             lambda : self.__onFolderCardClicked('rule', cfg.ruleFolder, signalBus.ruleFolderChangedSignal))
 
-        self.logFolderCard.clicked.connect(
-            lambda : self.__onFolderCardClicked('log', cfg.logFolder, signalBus.logFolderChangedSignal))
-
         self.sourceFolderCard.clicked.connect(
             lambda : self.__onFolderCardClicked('source', cfg.sourceFolder, signalBus.sourceFolderChangedSignal))
 
@@ -186,7 +174,6 @@ class SettingInterface(ScrollArea):
 
         signalBus.INTFolderChangedSignal.connect(self.__refreshContent)
         signalBus.ruleFolderChangedSignal.connect(self.__refreshContent)
-        signalBus.logFolderChangedSignal.connect(self.__refreshContent)
         signalBus.paraFolderChangedSignal.connect(self.__refreshContent)
         signalBus.sourceFolderChangedSignal.connect(self.__refreshContent)
         signalBus.targetFolderChangedSignal.connect(self.__refreshContent)
@@ -196,7 +183,6 @@ class SettingInterface(ScrollArea):
         self.paraFolderCard.setContent(cfg.get(cfg.paraFolder))
         self.INTFolderCard.setContent(cfg.get(cfg.INTFolder))
         self.ruleFolderCard.setContent(cfg.get(cfg.ruleFolder))
-        self.logFolderCard.setContent(cfg.get(cfg.logFolder))
         self.sourceFolderCard.setContent(cfg.get(cfg.sourceFolder))
         self.targetFolderCard.setContent(cfg.get(cfg.targetFolder))
 

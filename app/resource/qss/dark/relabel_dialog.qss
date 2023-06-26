@@ -1,0 +1,4 @@
+RelabelDialog, #scrollWidget {
+    background-color: rgb(43,43,43);
+    border: 5px solid rgb(255, 255, 255);
+}

@@ -11,11 +11,12 @@ from app.common.signal_bus import signalBus
 
 class LinkCard(QFrame):
     clicked = pyqtSignal()
-    def __init__(self, icon, title, url, signal, parent=None):
+    def __init__(self, icon, title, url, signal, name, parent=None):
         super().__init__(parent=parent)
         self.setFixedSize(198, 220)
         self._iconWidget = IconWidget(icon, self)
         self._titleLabel = QLabel(title, self)
+        self._name = name
         self._url = url
         self._path = MxPath(cfg.get(self._url))
         self._contentLabel = QLabel(self._path.lenLimPath(28), self)
@@ -43,7 +44,7 @@ class LinkCard(QFrame):
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
         url = QFileDialog.getExistingDirectory(
-            self, self.tr('Choose folder'), self._path.dirPath
+            self, self.tr('Choose folder'), './config{}'.format(self._name)
         )
         self.folderChanged(url)
 
@@ -78,7 +79,7 @@ class LinkCardView(SingleDirectionScrollArea):
         self.view.setObjectName('view')
         StyleSheet.LINK_CARD.apply(self)
 
-    def addCard(self, icon, title, url, signal):
-        card = LinkCard(icon, title, url, signal, self.view)
+    def addCard(self, icon, title, url, signal, name):
+        card = LinkCard(icon, title, url, signal, name, self.view)
         self.hBoxLayout.addWidget(card, 0, Qt.AlignLeft)
 

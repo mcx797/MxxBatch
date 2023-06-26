@@ -3,17 +3,12 @@ import json
 
 
 class MxLog:
-    _config_file_path = 'C:/Users/77902/Desktop/LeadingBatch/config/config.json'
-    #_config_file_path = 'config/config.json'
     def __init__(self):
-        with open(self._config_file_path, encoding='utf-8') as f:
-            cfg = json.load(f)
-            log_path = cfg['Folders']['Log']
-        self._url  = cfg['Folders']['Log']
+       self._wrong_url = './config/log/wrong.log'
 
     @property
     def wrong_url(self):
-        return '{}/wrong.log'.format(self._url)
+        return self._wrong_url
 
     def wrongLog(self, mes):
         with open(self.wrong_url, 'a', encoding='utf-8') as f:

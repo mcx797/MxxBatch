@@ -3,10 +3,11 @@ from PyQt5.QtGui import QIcon, QDesktopServices
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (NavigationInterface, NavigationItemPosition, MessageBox,
                             isDarkTheme, PopUpAniStackedWidget, qrouter)
+
 from qfluentwidgets import FluentIcon as FIF
 from app.components.frameless_window import FramelessWindow
 from app.components.title_bar import CustomTitleBar
-from app.common import resource
+from app.common import src
 
 from app.view.home_interface import HomeInterface
 from app.view.setting_interface import SettingInterface
@@ -24,6 +25,7 @@ from MXX.MxConfig.MxConfig.MxConfig import MxConfig
 from MXX.MxFile.MxJsonFile import MxJsonFile
 from MXX.MxLog.MxLog import MxLog
 
+
 class StackedWidget(QFrame):
     """ Stacked widget """
 
@@ -38,9 +40,11 @@ class StackedWidget(QFrame):
 
         self.view.currentChanged.connect(
             lambda i: self.currentWidgetChanged.emit(self.view.widget(i)))
+
     def addWidget(self, widget):
         """ add widget to view """
         self.view.addWidget(widget)
+
     def setCurrentWidget(self, widget, popOut=True):
         widget.verticalScrollBar().setValue(0)
         if not popOut:
@@ -48,6 +52,7 @@ class StackedWidget(QFrame):
         else:
             self.view.setCurrentWidget(
                 widget, True, False, 200, QEasingCurve.InQuad)
+
     def setCurrentIndex(self, index, popOut=False):
         self.setCurrentWidget(self.view.widget(index), popOut)
 
@@ -67,8 +72,6 @@ class MainWindow(FramelessWindow):
         ''' Initial Files '''
         self.initFile()
 
-
-
         self._home_interface = HomeInterface(self, self._config)
         self._setting_interface = SettingInterface(self)
         self._labeled_interface = LabeledInterface(self, self._config)
@@ -81,7 +84,6 @@ class MainWindow(FramelessWindow):
             self._type_labeled_interfaces[item] = TypeLabeledInterface(self, self._config, item, self._label_dic[item])
             self._type_labeled_interfaces[item].setObjectName('type_labeled_interfaces_{}'.format(item))
 
-
         ''' Initialization '''
         self.initLayout()
 
@@ -93,7 +95,6 @@ class MainWindow(FramelessWindow):
         self._config = MxConfig(cfg)
 
         self._label_dic = self._config.labelDic
-
 
     def initLayout(self):
         self.hBoxLayout.setSpacing(0)
@@ -144,15 +145,14 @@ class MainWindow(FramelessWindow):
         self.stackWidget.setCurrentIndex(0)
 
     def initWindow(self):
-        self.resize(960, 880)
+        self.resize(1060, 880)
         self.setMinimumWidth(960)
         self.setMinimumHeight(880)
-        self.setWindowIcon(QIcon(':/LeadingBatch/logo.png'))
+        self.setWindowIcon(QIcon(':/MXX/logo.png'))
         self.setWindowTitle('  LeadingBatch')
         self.titleBar.setAttribute(Qt.WA_StyledBackground)
         desktop = QApplication.desktop().availableGeometry()
-        w, h = desktop.width(), desktop.height()
-        self.move(30, 30)
+        self.move(30, 0)
 
         StyleSheet.MAIN_WINDOW.apply(self)
 

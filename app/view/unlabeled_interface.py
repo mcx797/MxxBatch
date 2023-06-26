@@ -29,33 +29,38 @@ class MesPanel(QFrame):
         self._mx_cfg = mx_cfg
         self._file_name_label = QLabel(self.tr('文件名字.txt'))
         self.vBoxLayout = QVBoxLayout(self)
-        self.vBoxLayout.setContentsMargins(15, 5, 5, 5)
-        self.vBoxLayout.setAlignment(Qt.AlignTop)
-        self.vBoxLayout.addWidget(self._file_name_label)
-        self.setFixedWidth(500)
         self._file_name_label.setObjectName('fileNameLabel')
         self.frame = TreeFrame(self, False)
-        self.vBoxLayout.addWidget(self.frame)
 
         self._button_open_file = PrimaryPushButton(self.tr('打开文件'))
         self._button_open_dir = PrimaryPushButton(self.tr('打开文件夹'))
         self._button_label = PrimaryPushButton(self.tr('进行分类'))
 
-
-        self.vBoxLayout.addWidget(self._button_open_dir)
-        self.vBoxLayout.addWidget(self._button_open_file)
-        self.vBoxLayout.addWidget(self._button_label)
-
         self._button_open_file.clicked.connect(self.openFile)
         self._button_open_dir.clicked.connect(self.openDir)
         self._button_label.clicked.connect(self.reLabel)
+        self.__initWidget()
+
+
+    def __initWidget(self):
+        self.vBoxLayout.setContentsMargins(15, 5, 5, 5)
+        self.vBoxLayout.setAlignment(Qt.AlignTop)
+        self.setFixedWidth(500)
+        self.vBoxLayout.addWidget(self._file_name_label)
+        self.vBoxLayout.addSpacing(10)
+        self.vBoxLayout.addWidget(self.frame)
+        self.vBoxLayout.addStretch(1)
+        self.vBoxLayout.addWidget(self._button_open_dir)
+        self.vBoxLayout.addWidget(self._button_open_file)
+        self.vBoxLayout.addWidget(self._button_label)
+        self.vBoxLayout.addSpacing(5)
 
     def reLabel(self):
         if not isinstance(self._file, MxReFile):
             return
         w = RelabelDialog(self._mx_cfg.labelDic)
         w.show()
-        w.exec_()
+        w.exec()
         if self._file.isLabeled:
             return
         if w.isOk:

@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QFrame, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt
 from MXX.MxPath.MxPath import MxPath
 from app.common.style_sheet import StyleSheet
+from app.view.post_label_dialog import PostLabelDialog
 
 
 class LabeledFileCardView(HomeCardView):
@@ -31,7 +32,6 @@ class LabeledFileCard(QFrame):
 
         self._icon_widget = IconWidget(icon, self)
         self._title_label = QLabel(file.fileName, self)
-        print(file.fileName)
         self._content_label = QLabel(MxPath(file.filePath).lenLimPath(46), self)
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
@@ -54,3 +54,10 @@ class LabeledFileCard(QFrame):
 
         self._title_label.setObjectName('titleLabel')
         self._content_label.setObjectName('contentLabel')
+
+    def mouseReleaseEvent(self, e):
+        super().mouseReleaseEvent(e)
+        print('xxx')
+        w = PostLabelDialog(self._file)
+        w.show()
+        w.exec_()

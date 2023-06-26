@@ -9,6 +9,7 @@ class MxReFileGallery(MxGallery):
         super().__init__(parent)
         self._type_dic = None
         self._is_all_labeled = False
+
         if not self.__loadSourceDir(source_path):
             self._root_path = None
             return
@@ -19,6 +20,9 @@ class MxReFileGallery(MxGallery):
         elif isinstance(source_path, MxPath):
             self._root_path = source_path
         else:
+            return False
+
+        if not os.path.isdir(source_path):
             return False
 
         self.__loadFiles(self._root_path)
