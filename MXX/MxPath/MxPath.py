@@ -1,9 +1,21 @@
 import os
 
 class MxPath:
-    def __init__(self, path:str = ''):
-        self._path = self.__loadPath(path)
-        self._default = ''
+    def __init__(self, path):
+        default = 'something wrong'
+        if isinstance(path, str):
+            self._path = self.__loadPath(path)
+            self._default = default
+        elif isinstance(path, list):
+            for item in path:
+                if not isinstance(item, str):
+                    self._path = None
+                    return
+            self._path = path
+            self._default = default
+        else:
+            self._path = None
+            self._default = default
 
     ''' output path '''
     @property
@@ -54,7 +66,6 @@ class MxPath:
         if self.isFile:
             return self.fileName.split('.')[-1]
 
-
     def lenLimPath(self, len_max):
         ans = ''
         ans_list = []
@@ -102,15 +113,46 @@ class MxPath:
     def __getitem__(self, item:int):
         return self._path[item]
 
+    def __sub__(self, other):
+        if isinstance(other, int):
+            if len(self) <= abs(other):
+                return MxPath('')
+            if other == 0:
+                return MxPath(self.path)
+            if other > 0:
+                ans = []
+                for i in range(len(self) - other):
+                    ans.append(self[i])
+                return MxPath(ans)
+            if other < 0:
+                ans = []
+                other = abs(other)
+                for i in range(other, len(self)):
+                    ans.append(self[i])
+                return MxPath(ans)
+        elif isinstance(other, MxPath):
+            if len(other) > len(self):
+                return MxPath('')
+            else:
+                for i in range(len(other)):
+                    if other[i] != self[i]:
+                        return MxPath('')
+                    return self - -len(other)
+
 
 if __name__ == '__main__':
     path = MxPath('C:\\Users/77902\\Desktop/LeadingBatch/config/config.json')
+    path1 = MxPath('C:/Users/77902')
+    path = path - path1
     print(len(path))
     print(path.path)
+    '''
     print(path.filePath)
+    print('dirPath')
     print(path.dirPath)
     print(path[len(path) - 1])
     print(path.lenLimPath(30))
     print(path.fileName)
     print(path.fileSuffix)
+    '''
 

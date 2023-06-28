@@ -14,6 +14,14 @@ class MxReFile(MxFile):
             self._is_labeled = False
             self._auto_label = label
             self._label = None
+        self._file_name_suffix = ''
+
+    @property
+    def fileNameSuffix(self):
+        return self._file_name_suffix
+
+    def setFileNameSuffix(self, suffix):
+        self._file_name_suffix = suffix
 
     def setLabel(self, label):
         self._is_labeled = True
@@ -57,6 +65,14 @@ class MxReFile(MxFile):
     @property
     def autoLabel(self):
         return self._auto_label
+
+    @property
+    def unkownLabel(self):
+        if self.isLabeled:
+            return self._label
+        if self.isAutoLabeled:
+            return self.autoLabel
+        return None
 
     @property
     def isLabeled(self):

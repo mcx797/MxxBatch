@@ -68,6 +68,13 @@ class HomeTypeCard(HomeCard):
         self._file_num = self._file_num + 1
         self.refreshCardCon("文件数: {}".format(self._file_num))
 
+    def subFile(self):
+        self._file_num = self._file_num - 1
+        self.refreshCardCon("文件数: {}".format(self._file_num))
+
+    def __len__(self):
+        return self._file_num
+
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
         signalBus.switchToSampleCard.emit(self._route_key)

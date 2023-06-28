@@ -21,11 +21,13 @@ from app.view.relabel_dialog import RelabelDialog
 from app.components.line_edit import LineEdit
 from app.components.file_card import FileCard
 from app.common.signal_bus import signalBus
+from app.view.post_label_dialog import PostLabelDialog
 
 
 class MesPanel(QFrame):
     def __init__(self, parent, mx_cfg):
         super().__init__(parent=parent)
+        self._parent = parent
         self._mx_cfg = mx_cfg
         self._file_name_label = QLabel(self.tr('文件名字.txt'))
         self.vBoxLayout = QVBoxLayout(self)
@@ -58,14 +60,14 @@ class MesPanel(QFrame):
     def reLabel(self):
         if not isinstance(self._file, MxReFile):
             return
-        w = RelabelDialog(self._mx_cfg.labelDic)
+        w = PostLabelDialog(self._file, self._mx_cfg)
         w.show()
         w.exec()
         if self._file.isLabeled:
             return
         if w.isOk:
             self._file.setLabel(w.typeName)
-            signalBus.fileLabeledSignal.emit(self._file)
+            signalBus.fileLabeledSignal.emit(self._file, self._parent._parent)
             self._file = None
             signalBus.autoUnlabeledSignal.emit()
         w.deleteLater()
@@ -89,6 +91,7 @@ class MesPanel(QFrame):
 class CardView(QWidget):
     def __init__(self, parent, mx_cfg:MxConfig):
         super().__init__(parent=parent)
+        self._parent = parent
         self._mx_cfg = mx_cfg
         self._card_view_label = QLabel(self.tr('未自动分类文件'), self)
         self._search_line_edit = LineEdit(self)

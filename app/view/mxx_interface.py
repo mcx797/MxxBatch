@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QFrame
 from PyQt5.QtGui import QPainter, QPen, QColor
-from qfluentwidgets import (ScrollArea, FluentIcon, PushButton, ToolButton, isDarkTheme, IconWidget)
+from qfluentwidgets import (ScrollArea, FluentIcon, PushButton, ToolButton, isDarkTheme, IconWidget, InfoBar)
 from app.common.style_sheet import StyleSheet
 from app.common.signal_bus import signalBus
 from MXX.MxConfig.MxConfig.MxConfig import MxConfig
@@ -154,4 +154,36 @@ class MxxInterface(ScrollArea):
 
         self.view.setObjectName('view')
         StyleSheet.MXX_INTERFACE.apply(self)
+
+    def showFileRepeat(self, name):
+        """ show restart tooltip """
+        info = InfoBar.warning(
+            title=self.tr('文件重复'),
+            content=self.tr('{} 文件重复'.format(name)),
+            isClosable=True,
+            orient=Qt.Vertical,
+            duration=10000,
+            parent=self
+        )
+
+        button_jump = PushButton(self.tr('跳转'))
+        w = QWidget(self)
+        hBoxLayout = QHBoxLayout(w)
+        hBoxLayout.addSpacing(150)
+        hBoxLayout.addWidget(button_jump)
+        info.addWidget(w)
+        if '_' in name:
+            type = name.split('_')[0]
+        else:
+            type = 'Others'
+        type = 'type_labeled_interfaces_{}'.format(type)
+        button_jump.clicked.connect(lambda : self.__jumpButtonClicked(info, type))
+
+
+
+    def __jumpButtonClicked(self, info, type):
+        info.close()
+        signalBus.switchToSampleCard.emit(type)
+
+
 

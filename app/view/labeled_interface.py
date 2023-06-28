@@ -16,11 +16,13 @@ from MXX.MxConfig.MxConfig.MxConfig import MxConfig
 
 from app.view.relabel_dialog import RelabelDialog
 from app.common.signal_bus import signalBus
+from app.view.post_label_dialog import PostLabelDialog
 
 
 class MesPanel(QFrame):
     def __init__(self, parent, mx_cfg):
         super().__init__(parent=parent)
+        self._parent = parent
         self._mx_cfg = mx_cfg
         self._file_name_label = QLabel(self.tr('文件名字.txt'))
         self._file_type_label = QLabel(self.tr('文件类型'))
@@ -33,8 +35,8 @@ class MesPanel(QFrame):
         self._file_type_label.setObjectName('fileTypeLabel')
         self.frame = TreeFrame(self, False)
 
-        self._button_open_file = PrimaryPushButton(self.tr('打开文件'))
         self._button_open_dir = PrimaryPushButton(self.tr('打开文件夹'))
+        self._button_open_file = PrimaryPushButton(self.tr('打开文件'))
         self._re_label = PrimaryPushButton(self.tr('更改分类'))
         self._ok_label = PrimaryPushButton(self.tr('确认分类'))
 
@@ -62,14 +64,15 @@ class MesPanel(QFrame):
     def reLabel(self):
         if not isinstance(self._file, MxReFile):
             return
-        w = RelabelDialog(self._mx_cfg.labelDic)
+        w = PostLabelDialog(self._file, self._mx_cfg)
         w.show()
         w.exec_()
         if self._file.isLabeled:
             return
         if w.isOk:
+            print(w.typeName)
             self._file.setLabel(w.typeName)
-            signalBus.fileLabeledSignal.emit(self._file)
+            signalBus.fileLabeledSignal.emit(self._file, self._parent._parent)
             self._file = None
             signalBus.autoLabeledSignal.emit()
         w.deleteLater()
@@ -80,7 +83,7 @@ class MesPanel(QFrame):
         if self._file.isLabeled:
             return
         self._file.setLabel(self._file.autoLabel)
-        signalBus.fileLabeledSignal.emit(self._file)
+        signalBus.fileLabeledSignal.emit(self._file, self._parent._parent)
         self._file = None
         signalBus.autoLabeledSignal.emit()
 
@@ -104,6 +107,7 @@ class MesPanel(QFrame):
 class CardView(QWidget):
     def __init__(self, parent, mx_cfg: MxConfig):
         super().__init__(parent=parent)
+        self._parent = parent
         self._mx_cfg = mx_cfg
         self._card_view_label = QLabel(self.tr('自动分类文件'), self)
         self._search_line_edit = LineEdit(self)

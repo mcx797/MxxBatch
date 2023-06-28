@@ -125,6 +125,25 @@ class MxParaItem(MxItem):
             return None
         return self._option
 
+    def setStrPara(self, con):
+        if self.type != MxParaType.STR:
+            return
+        self._value = con
+
+    def setOptionPara(self, con):
+        if self.type != MxParaType.OPTION:
+            return
+        if isinstance(con, int):
+            if con < len(self.option):
+                self._value = self.option[con]
+                return
+            return
+        elif isinstance(con, str):
+            for item in self.option:
+                if item == con:
+                    self._value = con
+                    return
+
 class MxParaType(Enum):
     STR = 0
     OPTION = 1

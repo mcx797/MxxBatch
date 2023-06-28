@@ -80,11 +80,11 @@ class MxINTItem(MxItem):
     def __str__(self):
         ans = '{{path:{}}}'.format(self.value)
         return ans
+
     @property
     def value(self):
         para_list = []
         for item in self._para:
             para_list.append(item.value)
         return self._value.format(para_list)
-
 

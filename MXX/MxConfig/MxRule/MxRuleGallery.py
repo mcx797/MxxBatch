@@ -39,11 +39,11 @@ class MxRuleItem(MxItem):
         super().__init__(parent, path, dic['target'])
         if not self.__loadSuffix(dic):
             self._name = None
-            MxLog().wrongLog('MxRuleGallery: rule key suffix format wrong in item: {}, file: {}'.format(self.name, path))
+            MxLog().wrongLog('MxRuleGallery: rule key suffix format wrong in item: {}, file: {}'.format(self._name, path))
             return
         if not self.__loadRules(dic):
             self._name = None
-            MxLog().wrongLog('MxRuleGallery: rule key rule format wrong in item: {}, file: {}'.format(self.name, path))
+            MxLog().wrongLog('MxRuleGallery: rule key rule format wrong in item: {}, file: {}'.format(self._name, path))
             return
 
     def __loadRules(self, dic):
@@ -82,18 +82,17 @@ class MxRuleItem(MxItem):
         for item in dic['suffix']:
             if not isinstance(item, str):
                 return False
-            if item == 'txt':
-                if MxSuffixType.TXT not in self._suffix:
-                    self._suffix.append(MxSuffixType.TXT)
-            elif item == 'xls':
-                if MxSuffixType.XLS not in self._suffix:
-                    self._suffix.append(MxSuffixType.XLS)
-            elif item == 'xlsx':
-                if MxSuffixType.XLSX not in self._suffix:
-                    self._suffix.append(MxSuffixType.XLSX)
-            else:
+            if not self.__isSuffix(item):
                 return False
         return True
+
+    def __isSuffix(self, value):
+        for item in MxSuffixType:
+            if item.value == value:
+                if item not in self._suffix:
+                    self._suffix.append(item)
+                return True
+        return False
 
     def __str__(self):
         ans = '{{target:{}, path: {}, suffix:{}, rule:['.format(self.name, self.path, self._suffix)
@@ -131,6 +130,17 @@ class MxSuffixType(Enum):
     TXT = 'txt'
     XLS = 'xls'
     XLSX = 'xlsx'
+    PPT = 'ppt'
+    PPTX = 'pptx'
+    BMP = 'bmp'
+    PDF = 'pdf'
+    PNG = 'png'
+    JPG = 'jpg'
+    JPE = 'jpe'
+    TIF = 'tif'
+    TIFF = 'tiff'
+    JPEG = 'jpeg'
+
 
 
 class MxRuleType(Enum):

@@ -39,7 +39,9 @@ class TreeFrame(Frame):
         self.tree.addTopLevelItem(item2)
         self.tree.expandAll()
         self.tree.setHeaderHidden(True)
-        self.setFixedSize(550, 400)
+        self.setMinimumHeight(300)
+        self.setMinimumWidth(300)
+
 
         if enableCheck:
             it = QTreeWidgetItemIterator(self.tree)
@@ -47,16 +49,21 @@ class TreeFrame(Frame):
                 it.value().setCheckState(0, Qt.Unchecked)
                 it += 1
 
+    def refreshPath(self, path:MxPath):
+        self.tree.clear()
+        if len(path) != 0:
+            item_top = QTreeWidgetItem([self.tr(path[0])])
+            item_temp = item_top
+            for i in range(1, len(path)):
+                item = QTreeWidgetItem([self.tr(path[i])])
+                item_temp.addChild(item)
+                item_temp = item
+            self.tree.addTopLevelItem(item_top)
+            self.tree.expandAll()
+        self.repaint()
+
     def refresh(self, file:MxReFile):
         self.tree.clear()
         path_temp = MxPath(cfg.get(cfg.sourceFolder))
         path_file = MxPath(file.filePath)
-        if len(path_file) != 0:
-            itemTop = QTreeWidgetItem([self.tr(path_file[len(path_temp) - 1])])
-            itemTemp = itemTop
-            for i in range(len(path_temp), len(path_file)):
-                item1 = QTreeWidgetItem([self.tr(path_file[i])])
-                itemTemp.addChild(item1)
-                itemTemp = item1
-            self.tree.addTopLevelItem(itemTop)
-            self.tree.expandAll()
+        self.refreshPath(path_file - (path_temp - 1))

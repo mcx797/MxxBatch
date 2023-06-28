@@ -55,6 +55,9 @@ class MxConfig:
     def __loadFiles(self, source_dir):
         self._re_file_gallery = MxReFileGallery(self, source_dir)
 
+    def targetPath(self, INT_name):
+        return self._INT_gallery[INT_name].value
+
     def typeFileNum(self, type_name):
         return self._re_file_gallery.typeFileNum(type_name)
 

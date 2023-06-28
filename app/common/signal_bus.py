@@ -1,6 +1,7 @@
 # coding: utf-8
 from PyQt5.QtCore import QObject, pyqtSignal
 from MXX.MxFile.MxReFile import MxReFile
+from qfluentwidgets import ScrollArea
 
 
 class SignalBus(QObject):
@@ -21,7 +22,8 @@ class SignalBus(QObject):
     autoLabeledSignal = pyqtSignal()
 
     homeMesRefresh = pyqtSignal()
-    fileLabeledSignal = pyqtSignal(MxReFile)
+    fileLabeledSignal = pyqtSignal(MxReFile, ScrollArea)
+    fileUnlabeledSignal = pyqtSignal(MxReFile)
 
 
 signalBus = SignalBus()

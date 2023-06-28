@@ -16,8 +16,10 @@ class StyleSheet(StyleSheetBase, Enum):
     UNLABELED_INTERFACE = 'unlabeled_interface'
     LABELED_INTERFACE = 'labeled_interface'
     RELABEL_DIALOG = 'relabel_dialog'
+    POST_DIALOG = 'post_dialog'
+
 
     def path(self, theme=Theme.AUTO):
         theme = qconfig.theme if theme == Theme.AUTO else theme
-        return f":/MXX/qss/{theme.value.lower()}/{self.value}.qss"
-        #return f".\\app\\resource\\qss\\{theme.value.lower()}\\{self.value}.qss"
+        #return f":/MXX/qss/{theme.value.lower()}/{self.value}.qss"
+        return f".\\app\\resource\\qss\\{theme.value.lower()}\\{self.value}.qss"

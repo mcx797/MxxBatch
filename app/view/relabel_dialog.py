@@ -13,7 +13,6 @@ class RelabelDialog(QDialog):
 
         self._type_box = ComboBox(self)
         self._item_box = ComboBox(self)
-        self._type_idx = 0
         self._label_dic = label_dic
 
 

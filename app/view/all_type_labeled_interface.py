@@ -13,6 +13,7 @@ class AllTypeLabeledInterface(MxxInterface):
         )
         self._type_dic = type_dic
         self.loadTypeDic()
+        self.vBoxLayout.addStretch(1)
         signalBus.fileLabeledSignal.connect(self.__addFileCard)
 
     def __addFileCard(self, file:MxReFile):
@@ -23,7 +24,7 @@ class AllTypeLabeledInterface(MxxInterface):
         self._type_view = {}
         for type in self._type_dic:
             self._type_view[type] = LabeledFileCardView(
-                 self.view, self.tr(type))
+                 self.view, self.tr(type), self._mx_cfg)
             self.vBoxLayout.addWidget(self._type_view[type])
             self._type_view[type].hide()
 

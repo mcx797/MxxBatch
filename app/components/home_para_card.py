@@ -41,6 +41,7 @@ class HomeParaCard(QFrame):
         super().__init__(parent=parent)
         self._icon_widget = IconWidget(icon, self)
         self._title_label = QLabel(para.name, self)
+        self._para = para
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
         self.setFixedSize(360, 90)
@@ -58,8 +59,11 @@ class HomeParaCard(QFrame):
         self.vBoxLayout.addStretch(1)
         self.vBoxLayout.addWidget(self._title_label)
 
-
         self._title_label.setObjectName('titleLabel')
+
+    @property
+    def para(self):
+        return self._para
 
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
@@ -70,6 +74,13 @@ class HomeStrParaCard(HomeParaCard):
         super().__init__(parent, icon, para)
         self._line_edit = LineEdit(self)
         self._line_edit.setText(self.tr(para.value))
+        self.__initWidget()
+        self._line_edit.textChanged.connect(self.__setPara)
+
+    def __setPara(self):
+        self.para.setStrPara(self._line_edit.text())
+
+    def __initWidget(self):
         self.vBoxLayout.addSpacing(10)
         self.vBoxLayout.addWidget(self._line_edit)
         self.vBoxLayout.addStretch(1)
@@ -81,6 +92,14 @@ class HomeOptionParaCard(HomeParaCard):
         self._combo_box.addItems(para.option)
         self._combo_box.setCurrentIndex(0)
         self._combo_box.setMinimumWidth(110)
+        self.__initWidget()
+        self._combo_box.currentIndexChanged.connect(self.__optionChanged)
+
+    def __optionChanged(self):
+        idx = self._combo_box.currentIndex()
+        self.para.setOptionPara(idx)
+
+    def __initWidget(self):
         self.vBoxLayout.addSpacing(10)
         self.vBoxLayout.addWidget(self._combo_box)
         self.vBoxLayout.addStretch(1)

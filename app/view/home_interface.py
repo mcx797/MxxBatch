@@ -115,7 +115,8 @@ class HomeInterface(ScrollArea):
         self.__initWidget()
 
         signalBus.homeMesRefresh.connect(self.__homeMesRefresh)
-        signalBus.fileLabeledSignal.connect(self.__typeCardViewRefresh)
+        signalBus.fileLabeledSignal.connect(self.__typeCardViewAddRefresh)
+        signalBus.fileUnlabeledSignal.connect(self.__typeCardViewSubRefresh)
 
         signalBus.ruleFolderChangedSignal.connect(self.__showRestartTooltip)
         signalBus.INTFolderChangedSignal.connect(self.__showRestartTooltip)
@@ -128,7 +129,7 @@ class HomeInterface(ScrollArea):
         InfoBar.success(
             self.tr('Updated successfully'),
             self.tr('Configuration takes effect after restart'),
-            duration=5500,
+            duration=-1,
             parent=self
         )
 
@@ -205,17 +206,19 @@ class HomeInterface(ScrollArea):
         self.vBoxLayout.addWidget(self._para_cards_view)
 
 
-    def __typeCardViewRefresh(self, file:MxReFile):
+    def __typeCardViewAddRefresh(self, file:MxReFile):
         self._type_file_view.show()
-        label = file.label
-        if '_' in label:
-            type_name = label.split('_')[0]
-        else:
-            type_name = "Others"
+        type_name = file.labelType
         card = self._home_cards['type_card_{}'.format(type_name)]
         card.addFile()
         card.show()
 
+    def __typeCardViewSubRefresh(self, file:MxReFile):
+        type_name = file.labelType
+        card = self._home_cards['type_card_{}'.format(type_name)]
+        card.subFile()
+        if len(card) == 0:
+            card.hide()
 
     def __homeMesRefresh(self):
         self._home_cards['labeled_file_card'].refreshCardCon(self.tr("自动分类文件数: {}\n分类文件数: {}"
