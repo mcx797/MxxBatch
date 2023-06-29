@@ -10,7 +10,6 @@ from app.common.signal_bus import signalBus
 
 
 class LinkCard(QFrame):
-    clicked = pyqtSignal()
     def __init__(self, icon, title, url, signal, name, parent=None):
         super().__init__(parent=parent)
         self.setFixedSize(198, 220)
@@ -53,7 +52,6 @@ class LinkCard(QFrame):
             return
         cfg.set(self._url, url)
         self._signal.emit()
-
 
     def __refreshContent(self):
         self._path = MxPath(cfg.get(self._url))

@@ -17,7 +17,6 @@ class MxPath:
             self._path = None
             self._default = default
 
-    ''' output path '''
     @property
     def path(self):
         if len(self._path) == 0:
@@ -85,7 +84,6 @@ class MxPath:
         ans = ans + temp
         return ans
 
-    ''' __method  '''
     def __loadPath(self, path:str):
         ans = []
         INTs = path.split('\\')
@@ -138,6 +136,15 @@ class MxPath:
                     if other[i] != self[i]:
                         return MxPath('')
                     return self - -len(other)
+
+    def __add__(self, other):
+        if isinstance(other, MxPath):
+            ans = []
+            for i in range(len(self)):
+                ans.append(self[i])
+            for i in range(len(other)):
+                ans.append(other[i])
+            return MxPath(ans)
 
 
 if __name__ == '__main__':

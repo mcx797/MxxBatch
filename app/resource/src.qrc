@@ -8,6 +8,7 @@
         <file>qss/dark/link_card.qss</file>
         <file>qss/dark/main_window.qss</file>
         <file>qss/dark/mxx_interface.qss</file>
+        <file>qss/dark/post_dialog.qss</file>
         <file>qss/dark/relabel_dialog.qss</file>
         <file>qss/dark/setting_interface.qss</file>
         <file>qss/dark/unlabeled_interface.qss</file>

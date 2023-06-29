@@ -9,6 +9,7 @@ from MXX.MxConfig.MxIntermediate.MxINTGallery import MxINTGallery
 from MXX.MxConfig.MxRule.MxRuleGallery import MxRuleGallery
 from MXX.MxFile.MxReFileGallery import MxReFileGallery
 from MXX.MxPath.MxPath import MxPath
+import shutil
 
 class MxConfig:
     def __init__(self, cfg):
@@ -16,6 +17,7 @@ class MxConfig:
             self.__loadConfig(cfg)
 
     def __loadConfig(self, cfg):
+        self._app_cfg = cfg
         para_dir = cfg.get(cfg.paraFolder)
         INT_dir = cfg.get(cfg.INTFolder)
         rule_dir = cfg.get(cfg.ruleFolder)
@@ -23,6 +25,10 @@ class MxConfig:
         self.__loadParas(para_dir)
         self.__loadINTs(INT_dir)
         self.__loadRules(rule_dir)
+        self.__loadFiles(source_dir)
+
+    def reloadFiles(self):
+        source_dir = self._app_cfg.get(self._app_cfg)
         self.__loadFiles(source_dir)
 
     def __loadParas(self, para_dir):
@@ -63,6 +69,29 @@ class MxConfig:
 
     def typeFileList(self, label_name):
         return self._re_file_gallery.typeFileList(label_name)
+
+    def renameAllFiles(self):
+        target_dir = self._app_cfg.get(self._app_cfg.targetFolder)
+        if not os.path.isdir((target_dir)):
+            return False
+        target_root_path = MxPath(target_dir)
+        for item in self._re_file_gallery.items:
+            if self._re_file_gallery[item].isLabeled:
+                file = self._re_file_gallery[item]
+                target_path = self.targetPath(file.label)
+                file_suffix = file.fileNameSuffix
+                suffix = file.fileSuffix
+                if file_suffix == '':
+                    target_path = target_path + '.' + suffix
+                else:
+                    target_path = target_path + '_' + file_suffix + '.' + suffix
+                print(target_path)
+                target_path = target_root_path + MxPath(target_path)
+                target_path_dir = (target_path - 1).path
+                print(target_path_dir)
+                if not os.path.exists(target_path_dir):
+                    os.makedirs(target_path_dir)
+                shutil.copy(file.filePath, target_path.path)
 
     @property
     def isFilesAllLabeled(self):

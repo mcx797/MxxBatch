@@ -1,4 +1,5 @@
 from MXX.MxFile.MxFile import MxFile
+from MXX.MxLog.MxLog import MxLog
 
 class MxReFile(MxFile):
     def __init__(self, path, mx_cfg):
@@ -26,6 +27,7 @@ class MxReFile(MxFile):
     def setLabel(self, label):
         self._is_labeled = True
         self._label = label
+        MxLog().renameLog(self.filePath, label, self.autoLabel)
         return
 
     def searchAutoUnlabeled(self, key_word):

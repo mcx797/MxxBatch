@@ -14,6 +14,12 @@ class MxGallery:
             return
         self._items[name] = item
 
+    @property
+    def items(self):
+        ans = []
+        for item in self._items:
+            ans.append(item)
+        return ans
 
     def __len__(self):
         return len(self._items)

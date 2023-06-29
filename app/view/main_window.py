@@ -76,7 +76,7 @@ class MainWindow(FramelessWindow):
         self._setting_interface = SettingInterface(self)
         self._labeled_interface = LabeledInterface(self, self._config)
         self._unlabeled_interface = UnlabeledInterface(self, self._config)
-        #self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._config, self._label_dic)
+        self._all_type_labeled_interface = AllTypeLabeledInterface(self, self._config, self._label_dic)
 
         self._type_labeled_interfaces = {}
 
@@ -90,6 +90,12 @@ class MainWindow(FramelessWindow):
         self.initNavigation()
 
         self.initWindow()
+
+        signalBus.sourceFolderChangedSignal.connect(self.__sourceFolderChanged)
+
+    def __sourceFolderChanged(self):
+        self._config.reloadFiles()
+        print('files reload finish')
 
     def initFile(self):
         self._config = MxConfig(cfg)
@@ -122,12 +128,11 @@ class MainWindow(FramelessWindow):
         self.addSubInterface(
             self._unlabeled_interface, 'unlabeledInterface', FIF.DATE_TIME, self.tr('Unlabeled'), NavigationItemPosition.TOP)
 
-        '''
-        self.addSubInterface(
-            self._all_type_labeled_interface, 'allTypeLabeledInterface', FIF.CALENDAR, self.tr('all type'), NavigationItemPosition.TOP)
+
+
 
         self.navigationInterface.addSeparator()
-        '''
+
 
         for item in self._label_dic:
             self.addSubInterface(

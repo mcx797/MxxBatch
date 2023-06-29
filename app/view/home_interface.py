@@ -153,8 +153,6 @@ class HomeInterface(ScrollArea):
         self.__initParaCard()
         self.vBoxLayout.addStretch(1)
 
-
-
     def __initFileCard(self):
         self._file_label_view = HomeFileCardView(
             self.view, self.tr("文件分类情况"))
@@ -205,7 +203,6 @@ class HomeInterface(ScrollArea):
                 self._para_cards_view.addOptionCard(para_gallery[item])
         self.vBoxLayout.addWidget(self._para_cards_view)
 
-
     def __typeCardViewAddRefresh(self, file:MxReFile):
         self._type_file_view.show()
         type_name = file.labelType
@@ -225,3 +222,4 @@ class HomeInterface(ScrollArea):
                                 .format(self._mx_cfg.autoLabeledFilesNum, self._mx_cfg.labeledFileNum)))
         self._home_cards['unlabeled_file_card'].refreshCardCon(self.tr("未自动分类文件数: {}\n未分类文件数: {}"
                                 .format(self._mx_cfg.autoUnlabeledFilesNum, self._mx_cfg.unlabeledFileNum)))
+

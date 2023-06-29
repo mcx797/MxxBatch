@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QFrame
 from PyQt5.QtGui import QPainter, QPen, QColor
-from qfluentwidgets import (ScrollArea, FluentIcon, PushButton, ToolButton, isDarkTheme, IconWidget, InfoBar)
+from qfluentwidgets import (ScrollArea, FluentIcon, PushButton, ToolButton, isDarkTheme, IconWidget, InfoBar, MessageBox)
 from app.common.style_sheet import StyleSheet
 from app.common.signal_bus import signalBus
 from MXX.MxConfig.MxConfig.MxConfig import MxConfig
@@ -32,16 +32,22 @@ class ToolBar(QWidget):
         super().__init__(parent=parent)
         self.titleLabel = QLabel(title, self)
         self.subtitleLabel = QLabel(subtitle, self)
+        self._parent = parent
 
         self.homeButton = PushButton(
             self.tr('回到主页'), self, FluentIcon.HOME)
-        self.sourceButton = PushButton(self.tr('文件重命名'), self, FluentIcon.GITHUB)
+        self.renameButton = PushButton(
+            self.tr('文件导出'), self, FluentIcon.GITHUB)
 
 
         self.vBoxLayout = QVBoxLayout(self)
         self.buttonLayout = QHBoxLayout()
 
         self.__initWidget()
+        self.homeButton.clicked.connect(
+            lambda: signalBus.switchToSampleCard.emit('homeInterface')
+        )
+        self.renameButton.clicked.connect(self._parent.renameButtonClicked)
 
     def __initWidget(self):
         self.setFixedHeight(138)
@@ -57,15 +63,11 @@ class ToolBar(QWidget):
         self.buttonLayout.setSpacing(4)
         self.buttonLayout.setContentsMargins(0, 0, 0, 0)
         self.buttonLayout.addWidget(self.homeButton, 0, Qt.AlignLeft)
-        self.buttonLayout.addWidget(self.sourceButton, 0, Qt.AlignLeft)
+        self.buttonLayout.addWidget(self.renameButton, 0, Qt.AlignLeft)
         self.buttonLayout.addStretch(1)
 
         self.titleLabel.setObjectName('titleLabel')
         self.subtitleLabel.setObjectName('subtitleLabel')
-
-        self.homeButton.clicked.connect(
-            lambda: signalBus.switchToSampleCard.emit('homeInterface')
-        )
 
 
 class ExampleCard(QWidget):
@@ -179,11 +181,17 @@ class MxxInterface(ScrollArea):
         type = 'type_labeled_interfaces_{}'.format(type)
         button_jump.clicked.connect(lambda : self.__jumpButtonClicked(info, type))
 
-
-
     def __jumpButtonClicked(self, info, type):
         info.close()
         signalBus.switchToSampleCard.emit(type)
 
+    def renameButtonClicked(self):
+        self._mx_cfg.renameAllFiles()
+        self.showMesDialog()
 
 
+    def showMesDialog(self):
+        title = self.tr('文件导出完成')
+        content = self.tr('文件导出完成')
+        w = MessageBox(title, content, self.window())
+        w.exec()
